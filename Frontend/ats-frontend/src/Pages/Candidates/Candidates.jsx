@@ -3,22 +3,44 @@ import { useEffect, useState } from "react";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
 
-import StatsCards from "../../components/dashboard/StatsCards";
-import { getDashboardStats } from "../../services/dashboardService";
+import CandidateHeader from "../../components/candidates/CandidateHeader";
+import CandidateFilters from "../../components/candidates/CandidateFilters";
+import CandidateTable from "../../components/candidates/CandidateTable";
+import CandidateDetails from "../../components/candidates/CandidateDetails";
+
+import { getCandidates } from "../../services/candidateService";
 
 function Candidates() {
 
-  const [stats, setStats] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const [candidates, setCandidates] = useState([]);
+
+  const [search, setSearch] = useState("");
+
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
+
+  const [filters, setFilters] = useState({
+
+    speciality: "",
+
+    experience: "",
+
+    location: [],
+
+    hiringStage: []
+
+  });
 
   useEffect(() => {
 
-    const loadDashboard = async () => {
+    const loadCandidates = async () => {
 
       try {
 
-        const data = await getDashboardStats();
+        const data = await getCandidates();
 
-        setStats(data);
+        setCandidates(data);
 
       }
 
@@ -30,63 +52,142 @@ function Candidates() {
 
     };
 
-    loadDashboard();
+    loadCandidates();
 
   }, []);
+
+
+
+  const filteredCandidates = candidates.filter((candidate) => {
+
+    const searchMatch =
+
+      candidate.candidate_name
+
+      ?.toLowerCase()
+
+      .includes(search.toLowerCase());
+
+
+    const specialityMatch =
+
+      !filters.speciality ||
+
+      candidate.specialization === filters.speciality;
+
+
+    const experienceMatch =
+
+      !filters.experience ||
+
+      candidate.experience === filters.experience;
+
+
+    const locationMatch =
+
+      filters.location.length === 0 ||
+
+      filters.location.includes(
+
+        candidate.hospital_location
+
+      );
+
+
+    const stageMatch =
+
+      filters.hiringStage.length === 0 ||
+
+      filters.hiringStage.includes(
+
+        candidate.status
+
+      );
+
+
+    return (
+
+      searchMatch &&
+
+      specialityMatch &&
+
+      experienceMatch &&
+
+      locationMatch &&
+
+      stageMatch
+
+    );
+
+  });
+
+
 
   return (
 
     <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
 
-      <Sidebar />
+      <Sidebar sidebarOpen={sidebarOpen} />
 
-      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto">
 
-      <div className="flex-1 overflow-hidden">
+        <Topbar
 
-        
+          sidebarOpen={sidebarOpen}
 
-        <Topbar />
+          setSidebarOpen={setSidebarOpen}
 
-      
-
-        <StatsCards stats={stats} />
+        />
 
         <div className="p-4">
 
           <div className="grid grid-cols-12 gap-4">
 
+            {/* Filters */}
 
             <div className="col-span-2">
 
-              <div className="bg-white rounded-xl p-4 shadow">
+              <CandidateFilters
 
-                Filters
+                filters={filters}
 
-              </div>
+                setFilters={setFilters}
 
-            </div>
-
-          
-            <div className="col-span-7">
-
-              <div className="bg-white rounded-xl p-4 shadow">
-
-                Candidate Table
-
-              </div>
+              />
 
             </div>
 
-         
+            {/* Table */}
 
-            <div className="col-span-3">
+            <div className="col-span-8">
 
-              <div className="bg-white rounded-xl p-4 shadow">
+              <CandidateHeader
 
-                Candidate Details
+                search={search}
 
-              </div>
+                setSearch={setSearch}
+
+              />
+
+              <CandidateTable
+
+                candidates={filteredCandidates}
+
+                setSelectedCandidate={setSelectedCandidate}
+
+              />
+
+            </div>
+
+            {/* Details */}
+
+            <div className="col-span-2">
+
+              <CandidateDetails
+
+                candidate={selectedCandidate}
+
+              />
 
             </div>
 

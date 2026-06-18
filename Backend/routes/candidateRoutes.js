@@ -1,44 +1,48 @@
-console.log("Candidate Routes Loaded");
+
+/*console.log("Candidate Routes Loaded");
+
 const express = require("express");
 const router = express.Router();
+
 const db = require("../config/db");
 
-router.get("/", (req, res) => {
-  db.query("SELECT * FROM candidates", (err, result) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json(err);
-    }
+
+// =======================
+// Get All Candidates
+// =======================
+
+router.get("/", async (req, res) => {
+
+  try {
+
+    const [result] = await db.query(
+      "SELECT * FROM candidates ORDER BY id DESC"
+    );
 
     res.status(200).json(result);
-  });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      message: err.message
+    });
+
+  }
+
 });
-router.post("/", (req, res) => {
-  const {
-    recruiter_name,
-    candidate_name,
-    education,
-    mobile,
-    email,
-    hospital_name,
-    hospital_location,
-    salary_expectation,
-    status,
-    interview_status,
-    remarks
-  } = req.body;
 
-  const sql = `
-    INSERT INTO candidates
-    (recruiter_name, candidate_name, education, mobile, email,
-     hospital_name, hospital_location, salary_expectation,
-     status, interview_status, remarks)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
 
-  db.query(
-    sql,
-    [
+// =======================
+// Add Candidate
+// =======================
+
+router.post("/", async (req, res) => {
+
+  try {
+
+    const {
       recruiter_name,
       candidate_name,
       education,
@@ -50,98 +54,595 @@ router.post("/", (req, res) => {
       status,
       interview_status,
       remarks
-    ],
-    (err, result) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json(err);
-      }
+    } = req.body;
+
+    const sql = `
+      INSERT INTO candidates
+      (
+        recruiter_name,
+        candidate_name,
+        education,
+        mobile,
+        email,
+        hospital_name,
+        hospital_location,
+        salary_expectation,
+        status,
+        interview_status,
+        remarks
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const [result] = await db.query(sql, [
+      recruiter_name,
+      candidate_name,
+      education,
+      mobile,
+      email,
+      hospital_name,
+      hospital_location,
+      salary_expectation,
+      status,
+      interview_status,
+      remarks
+    ]);
+
+    res.status(201).json({
+      message: "Candidate Added Successfully",
+      id: result.insertId
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      message: err.message
+    });
+
+  }
+
+});
+
+
+// =======================
+// Get Candidate By ID
+// =======================
+
+router.get("/:id", async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+
+    const [result] = await db.query(
+      "SELECT * FROM candidates WHERE id = ?",
+      [id]
+    );
+
+    if (result.length === 0) {
+
+      return res.status(404).json({
+        message: "Candidate not found"
+      });
+
+    }
+
+    res.json(result[0]);
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      message: err.message
+    });
+
+  }
+
+});
+
+
+// =======================
+// Update Candidate
+// =======================
+
+router.put("/:id", async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+
+    const {
+      status,
+      interview_status,
+      remarks
+    } = req.body;
+
+    const sql = `
+      UPDATE candidates
+      SET
+      status = ?,
+      interview_status = ?,
+      remarks = ?
+      WHERE id = ?
+    `;
+
+    await db.query(sql, [
+      status,
+      interview_status,
+      remarks,
+      id
+    ]);
+
+    res.json({
+      message: "Candidate Updated Successfully"
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      message: err.message
+    });
+
+  }
+
+});
+
+
+// =======================
+// Delete Candidate
+// =======================
+
+router.delete("/:id", async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+
+    const [result] = await db.query(
+      "DELETE FROM candidates WHERE id = ?",
+      [id]
+    );
+
+    if (result.affectedRows === 0) {
+
+      return res.status(404).json({
+        message: "Candidate not found"
+      });
+
+    }
+
+    res.json({
+      message: "Candidate Deleted Successfully"
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      message: err.message
+    });
+
+  }
+
+});
+
+
+module.exports = router;*/
+console.log("Candidate Routes Loaded");
+
+const express = require("express");
+const router = express.Router();
+
+const db = require("../config/db");
+
+const multer = require("multer");
+
+
+// =======================
+// Multer Configuration
+// =======================
+
+const storage = multer.diskStorage({
+
+  destination: (req, file, cb) => {
+
+    cb(null, "uploads/");
+
+  },
+
+  filename: (req, file, cb) => {
+
+    cb(null, Date.now() + "-" + file.originalname);
+
+  }
+
+});
+
+const upload = multer({ storage });
+
+
+// =======================
+// Get All Candidates
+// =======================
+
+router.get("/", async (req, res) => {
+
+  try {
+
+    const [result] = await db.query(
+
+      "SELECT * FROM candidates ORDER BY id DESC"
+
+    );
+
+    res.status(200).json(result);
+
+  }
+
+  catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+
+      message: err.message
+
+    });
+
+  }
+
+});
+
+
+// =======================
+// Add Candidate
+// =======================
+
+router.post(
+
+  "/",
+
+  upload.single("cv"),
+
+  async (req, res) => {
+
+    try {
+
+      const {
+
+        recruiter_name,
+
+        candidate_name,
+
+        education,
+
+        specialization,
+
+        mobile,
+
+        email,
+
+        hospital_name,
+
+        hospital_location,
+
+        cv_forward_date,
+
+        salary_expectation,
+
+        status,
+
+        interview_status,
+
+        remarks,
+
+        interview_date,
+
+        interview_time
+
+      } = req.body;
+
+
+      const cv_name = req.file
+
+        ? req.file.originalname
+
+        : null;
+
+
+      const cv_path = req.file
+
+        ? req.file.path
+
+        : null;
+
+
+      const sql = `
+
+      INSERT INTO candidates(
+
+      recruiter_name,
+
+      candidate_name,
+
+      education,
+
+      specialization,
+
+      mobile,
+
+      email,
+
+      hospital_name,
+
+      hospital_location,
+
+      cv_name,
+
+      cv_path,
+
+      cv_forward_date,
+
+      salary_expectation,
+
+      status,
+
+      interview_status,
+
+      remarks,
+
+      interview_date,
+
+      interview_time
+
+      )
+
+      VALUES(
+
+      ?,?,?,?,?,?,
+
+      ?,?,?,?,?,?,
+
+      ?,?,?,?,?
+
+      )
+
+      `;
+
+
+      const [result] = await db.query(
+
+        sql,
+
+        [
+
+          recruiter_name,
+          candidate_name,
+          education,
+          specialization,
+          mobile,
+          email,
+          hospital_name,
+          hospital_location,
+          cv_name,
+          cv_path,
+          cv_forward_date,
+          salary_expectation,
+          status,
+          interview_status,
+          remarks,
+          interview_date,
+          interview_time
+        ]
+
+      );
+
 
       res.status(201).json({
+
         message: "Candidate Added Successfully",
+
         id: result.insertId
+
       });
+
     }
-  );
+
+    catch (err) {
+
+      console.error(err);
+
+      res.status(500).json({
+
+        message: err.message
+
+      });
+
+    }
+
+  }
+
+);
+
+
+// =======================
+// Get Candidate By Id
+// =======================
+
+router.get("/:id", async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+
+    const [result] = await db.query(
+
+      "SELECT * FROM candidates WHERE id = ?",
+
+      [id]
+
+    );
+
+    if (result.length === 0) {
+
+      return res.status(404).json({
+
+        message: "Candidate not found"
+
+      });
+
+    }
+
+    res.json(result[0]);
+
+  }
+
+  catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+
+      message: err.message
+
+    });
+
+  }
+
 });
 
-// Get Candidate By ID
-router.get("/:id", (req, res) => {
-  const { id } = req.params;
 
-  db.query(
-    "SELECT * FROM candidates WHERE id = ?",
-    [id],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json(err);
-      }
-
-      if (result.length === 0) {
-        return res.status(404).json({
-          message: "Candidate not found",
-        });
-      }
-
-      res.json(result[0]);
-    }
-  );
-});
-
+// =======================
 // Update Candidate
-router.put("/:id", (req, res) => {
-  const { id } = req.params;
+// =======================
 
-  const {
-    status,
-    interview_status,
-    remarks
-  } = req.body;
+router.put("/:id", async (req, res) => {
 
-  const sql = `
-    UPDATE candidates
-    SET status = ?, interview_status = ?, remarks = ?
-    WHERE id = ?
-  `;
+  try {
 
-  db.query(
-    sql,
-    [status, interview_status, remarks, id],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json(err);
-      }
+    const { id } = req.params;
 
-      res.json({
-        message: "Candidate Updated Successfully"
-      });
-    }
-  );
+    const {
+
+      status,
+
+      interview_status,
+
+      remarks
+
+    } = req.body;
+
+
+    await db.query(
+
+      `
+
+      UPDATE candidates
+
+      SET
+
+      status=?,
+
+      interview_status=?,
+
+      remarks=?
+
+      WHERE id=?
+
+      `,
+
+      [
+
+        status,
+
+        interview_status,
+
+        remarks,
+
+        id
+
+      ]
+
+    );
+
+
+    res.json({
+
+      message: "Candidate Updated Successfully"
+
+    });
+
+  }
+
+  catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+
+      message: err.message
+
+    });
+
+  }
+
 });
 
+
+// =======================
 // Delete Candidate
-router.delete("/:id", (req, res) => {
-  const { id } = req.params;
+// =======================
 
-  db.query(
-    "DELETE FROM candidates WHERE id = ?",
-    [id],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json(err);
-      }
+router.delete("/:id", async (req, res) => {
 
-      if (result.affectedRows === 0) {
-        return res.status(404).json({
-          message: "Candidate not found"
-        });
-      }
+  try {
 
-      res.json({
-        message: "Candidate Deleted Successfully"
+    const { id } = req.params;
+
+    const [result] = await db.query(
+
+      "DELETE FROM candidates WHERE id = ?",
+
+      [id]
+
+    );
+
+    if (result.affectedRows === 0) {
+
+      return res.status(404).json({
+
+        message: "Candidate not found"
+
       });
-    }
-  );
-});
-module.exports = router;
 
+    }
+
+    res.json({
+
+      message: "Candidate Deleted Successfully"
+
+    });
+
+  }
+
+  catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+
+      message: err.message
+
+    });
+
+  }
+
+});
+
+
+module.exports = router;
