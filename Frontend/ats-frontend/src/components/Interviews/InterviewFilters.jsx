@@ -1,6 +1,6 @@
 import { FaSearch, FaCalendarAlt, FaPlus } from "react-icons/fa";
 
-export default function InterviewFilters() {
+export default function InterviewFilters({ openModal }) {
   return (
     <div className="bg-white p-4 rounded-xl shadow-sm flex items-center gap-4 mb-6">
 
@@ -48,7 +48,7 @@ export default function InterviewFilters() {
 
       {/* Button */}
 
-      <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center gap-2">
+      <button onClick={openModal} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center gap-2">
 
         <FaPlus />
 

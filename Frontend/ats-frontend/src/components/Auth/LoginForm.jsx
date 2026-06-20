@@ -1,122 +1,18 @@
-/*import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-function LoginForm() {
-  const [role, setRole] = useState("admin");
-  const navigate = useNavigate();
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const email = e.target.email.value;
-    const password = e.target.password.value;
-
-    if (!email || !password) {
-      alert("Please fill all fields");
-      return;
-    }
-
-    const userData = {
-      role,
-      email,
-    };
-
-    localStorage.setItem("user", JSON.stringify(userData));
-
-    navigate("/dashboard");
-  };
-
-  return (
-    <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-blue-600">
-          ATS Portal
-        </h1>
-
-        <p className="text-gray-500 mt-2">
-          Admin & Recruiter Login
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-2 font-medium">
-            Login As
-          </label>
-
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="w-full border rounded-lg p-3"
-          >
-            <option value="admin">Admin</option>
-            <option value="recruiter">Recruiter</option>
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-2 font-medium">
-            Email
-          </label>
-
-          <input
-            type="email"
-            name="email"
-            placeholder="Enter Email"
-            className="w-full border rounded-lg p-3"
-            required
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="block mb-2 font-medium">
-            Password
-          </label>
-
-          <input
-            type="password"
-            name="password"
-            placeholder="Enter Password"
-            className="w-full border rounded-lg p-3"
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
-        >
-          Login
-        </button>
-      </form>
-    </div>
-  );
-}
-
-export default LoginForm;*/
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function LoginForm() {
   const navigate = useNavigate();
-
   const [role, setRole] = useState("admin");
-
   const [isLogin, setIsLogin] = useState(true);
-
   const [showForgot, setShowForgot] = useState(false);
-
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const name = e.target.name?.value;
-
     const email = e.target.email.value;
-
     const password = e.target.password.value;
 
     // CREATE ACCOUNT
-
     if (!isLogin) {
       const account = {
         name,
@@ -124,31 +20,23 @@ function LoginForm() {
         password,
         role,
       };
-
       localStorage.setItem(
         "account",
         JSON.stringify(account)
       );
-
       alert("Account Created Successfully");
-
       setIsLogin(true);
-
       return;
     }
 
     // LOGIN
-
     const savedAccount = JSON.parse(
       localStorage.getItem("account")
     );
-
     if (!savedAccount) {
       alert("Please create account first");
-
       return;
     }
-
     if (
       savedAccount.email === email &&
       savedAccount.password === password
@@ -160,35 +48,24 @@ function LoginForm() {
           role: savedAccount.role,
         })
       );
-
       navigate("/dashboard");
     } else {
       alert("Invalid Email or Password");
     }
   };
-
   // FORGOT PASSWORD
-
   if (showForgot) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-6">
-
         <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
-
           <div className="flex items-center justify-center gap-2 mb-6">
-
             <div className="w-7 h-7 rounded-full bg-cyan-400"></div>
-
             <h1 className="text-2xl font-bold">
               DCS
             </h1>
-
           </div>
-
           <h2 className="text-center text-2xl font-semibold mb-8">
-
             FORGOT PASSWORD
-
           </h2>
 
           <input
@@ -196,73 +73,47 @@ function LoginForm() {
             placeholder="Enter Email"
             className="w-full border rounded-lg p-3 mb-6"
           />
-
           <button
             className="w-full bg-cyan-500 text-white py-3 rounded-lg hover:bg-cyan-600"
           >
-
             Send Reset Link
-
           </button>
-
           <button
             onClick={() => setShowForgot(false)}
             className="w-full mt-5 text-cyan-600"
           >
-
             Back To Login
-
           </button>
-
         </div>
-
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-6 overflow-y-auto">
-
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
-
-        <h2 className="text-center text-2xl font-semibold mb-8">
-
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-5">
+        <h2 className="text-center text-2xl font-semibold mb-6">
           {isLogin ? "SIGN IN" : "CREATE ACCOUNT"}
-
         </h2>
-
         <form onSubmit={handleSubmit}>
-
           {!isLogin && (
-
             <div className="mb-4">
-
               <label className="block mb-2">
-
                 Name
-
               </label>
-
               <input
                 type="text"
                 name="name"
                 placeholder="Enter Name"
-                className="w-full border rounded-lg p-3"
+                className="w-full border rounded-lg p-2"
                 required
               />
-
             </div>
-
           )}
-
           <div className="mb-4">
-
             <label className="block mb-2">
-
               Login As
-
             </label>
-
             <select
               value={role}
               onChange={(e) =>
@@ -272,29 +123,17 @@ function LoginForm() {
             >
 
               <option value="admin">
-
                 Admin
-
               </option>
-
               <option value="recruiter">
-
                 Recruiter
-
               </option>
-
             </select>
-
           </div>
-
           <div className="mb-4">
-
             <label className="block mb-2">
-
               Email
-
             </label>
-
             <input
               type="email"
               name="email"
@@ -302,17 +141,11 @@ function LoginForm() {
               className="w-full border rounded-lg p-3"
               required
             />
-
           </div>
-
           <div className="mb-4">
-
             <label className="block mb-2">
-
-              Password
-
+              Passwor
             </label>
-
             <input
               type="password"
               name="password"
@@ -320,13 +153,9 @@ function LoginForm() {
               className="w-full border rounded-lg p-3"
               required
             />
-
           </div>
-
           {isLogin && (
-
             <div className="text-right mb-5">
-
               <button
                 type="button"
                 onClick={() =>
@@ -334,15 +163,10 @@ function LoginForm() {
                 }
                 className="text-cyan-600 text-sm"
               >
-
                 Forgot Password?
-
               </button>
-
             </div>
-
           )}
-
           <button
             type="submit"
             className="w-full bg-cyan-500 text-white py-3 rounded-lg hover:bg-cyan-600"
@@ -351,51 +175,33 @@ function LoginForm() {
             {isLogin
               ? "Login"
               : "Create Account"}
-
           </button>
-
         </form>
-
         <div className="text-center mt-6">
-
           {isLogin ? (
-
             <p>
-
               Don't have an account?{" "}
-
               <button
                 onClick={() =>
                   setIsLogin(false)
                 }
                 className="text-cyan-600 font-semibold"
               >
-
                 Create Account
-
               </button>
-
             </p>
-
           ) : (
-
             <p>
-
               Already have an account?{" "}
-
               <button
                 onClick={() =>
                   setIsLogin(true)
                 }
                 className="text-cyan-600 font-semibold"
               >
-
                 Sign In
-
               </button>
-
             </p>
-
           )}
 
         </div>
