@@ -6,7 +6,6 @@ import Topbar from "../../components/layout/Topbar";
 import CandidateHeader from "../../components/candidates/CandidateHeader";
 import CandidateFilters from "../../components/candidates/CandidateFilters";
 import CandidateTable from "../../components/candidates/CandidateTable";
-import CandidateDetails from "../../components/candidates/CandidateDetails";
 
 import { getCandidates } from "../../services/candidateService";
 
@@ -18,7 +17,7 @@ function Candidates() {
 
   const [search, setSearch] = useState("");
 
-  const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const [ setSelectedCandidate] = useState(null);
 
   const [filters, setFilters] = useState({
 
@@ -159,7 +158,7 @@ function Candidates() {
 
             {/* Table */}
 
-            <div className="col-span-8">
+            <div className="col-span-10">
 
               <CandidateHeader
 
@@ -179,17 +178,8 @@ function Candidates() {
 
             </div>
 
-            {/* Details */}
+         
 
-            <div className="col-span-2">
-
-              <CandidateDetails
-
-                candidate={selectedCandidate}
-
-              />
-
-            </div>
 
           </div>
 

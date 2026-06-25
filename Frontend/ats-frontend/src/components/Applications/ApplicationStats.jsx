@@ -1,61 +1,124 @@
 import { useEffect, useState } from "react";
-import { getApplicationStats } from "../../services/applicationService";
+
+import { getApplicationStats }from "../../services/applicationService";
+import {
+  FaFileAlt,
+  FaShareAlt,
+  FaUserCheck,
+  FaCalendarCheck,
+  FaCheckCircle,
+  FaTimesCircle,
+} from "react-icons/fa";
 
 export default function ApplicationStats() {
-  const [stats, setStats] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
+   const [stats, setStats] = useState({});
   useEffect(() => {
-    fetchStats();
+    loadStats();
   }, []);
 
-  const fetchStats = async () => {
-    try {
-      setLoading(true);
-
-      const res = await getApplicationStats();
-      const data = res?.data || {};
-      const formatted = [
-        { label: "Total Applications", value: data.totalApplications || 0, color: "bg-blue-100 text-blue-700" },
-        { label: "CV Shared", value: data.cvShared || 0, color: "bg-purple-100 text-purple-700" },
-        { label: "Shortlisted", value: data.shortlisted || 0, color: "bg-orange-100 text-orange-700" },
-        { label: "Interview", value: data.interview || 0, color: "bg-yellow-100 text-yellow-700" },
-        { label: "Selected", value: data.selected || 0, color: "bg-emerald-100 text-emerald-700" },
-        { label: "Rejected", value: data.rejected || 0, color: "bg-red-100 text-red-700" },
-      ];
-
-      setStats(formatted);
-    } 
-    catch (error) {
-  console.error(error);
-  setError("Failed to load stats");
-}
-finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-20 bg-gray-100 animate-pulse rounded-xl"></div>
-        ))}
-      </div>
-    );
+  const loadStats = async () => {
+  try {
+    const res = await getApplicationStats();
+    console.log("STATS API RESPONSE:", res);
+    setStats(res);
+  } catch (error) {
+    console.log(error);
   }
-  if (error) {
-    return <p className="text-red-500 text-sm">{error}</p>;
-  }
+};
+  const cards = [
+    {
+      title: "Total Applications",
+      value: stats?.totalApplications || 0,
+      icon: <FaFileAlt />,
+      iconBg: "bg-blue-200",
+      iconColor: "text-blue-600",
+    },
+    {
+      title: "CV Shared",
+      value: stats?.cvShared || 0,
+      icon: <FaShareAlt />,
+      iconBg: "bg-purple-200",
+      iconColor: "text-purple-600",
+    },
+    {
+      title: "Shortlisted",
+      value: stats?.shortlisted || 0,
+      icon: <FaUserCheck />,
+      iconBg: "bg-orange-200",
+      iconColor: "text-orange-600",
+    },
+    {
+      title: "Interview",
+      value: stats?.interview || 0,
+      icon: <FaCalendarCheck />,
+      iconBg: "bg-yellow-200",
+      iconColor: "text-yellow-600",
+    },
+    {
+      title: "Selected",
+      value: stats?.selected || 0,
+      icon: <FaCheckCircle />,
+      iconBg: "bg-emerald-200",
+      iconColor: "text-emerald-600",
+    },
+    {
+      title: "Rejected",
+      value: stats?.rejected || 0,
+      icon: <FaTimesCircle />,
+      iconBg: "bg-red-200",
+      iconColor: "text-red-600",
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-      {stats.map((s, i) => (
-        <div key={i} className="p-4 rounded-2xl shadow-sm border bg-white hover:shadow-md transition">
-          <p className="text-xs text-gray-500">{s.label}</p>
-          <p className="text-xl font-bold mt-1">{s.value}</p>
+    <div className="grid grid-cols-6 gap-3">
+      {cards.map((item, index) => (
+        <div
+          key={index}
+          className="
+          bg-white
+          rounded-xl
+          px-2
+          py-2
+          shadow-sm
+          border
+          "
+        >
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-xs text-gray-500">
+                {item.title}
+              </p>
+              <h2 className="text-2xl font-bold mt-1">
+                {item.value}
+              </h2>
+            </div>
+            <div
+              className={`
+              w-10
+              h-10
+              rounded-full
+              flex
+              items-center
+              justify-center
+              ${item.iconBg}
+              ${item.iconColor}
+              `}
+            >
+              {item.icon}
+            </div>
+          </div>
         </div>
       ))}
+
     </div>
+
   );
 }
+
+
+ 
+
+  
+
+

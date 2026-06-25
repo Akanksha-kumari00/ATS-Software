@@ -8,9 +8,7 @@ const {
 } = require("../controllers/dashboardController");
 
 router.get("/stats", async (req, res) => {
-
   try {
-
     const sql = `
       SELECT
         COUNT(*) AS totalCandidates,
@@ -20,25 +18,15 @@ router.get("/stats", async (req, res) => {
         SUM(status='Rejected') AS rejectedCandidates
       FROM candidates
     `;
-
     const [result] = await db.query(sql);
-
     res.json(result[0]);
-
   }
-
   catch (error) {
-
     console.log(error);
-
     res.status(500).json({
-
       message: "Server Error"
-
     });
-
   }
-
 });
 
 router.get("/pipeline", getRecruitmentPipeline);
