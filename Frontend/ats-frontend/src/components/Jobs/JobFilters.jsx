@@ -1,24 +1,66 @@
-export default function JobFilters() {
+export default function JobFilters({
+  filters,
+  setFilters,
+  onSearch,
+  onReset,
+  onExport
+}) {
+  const handleChange = (e) => {
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   return (
-    <div className="bg-white p-4 rounded-xl shadow-sm flex flex-col md:flex-row gap-3">
+    <div className="bg-white p-4 rounded-xl shadow-sm flex flex-wrap gap-3 items-center">
 
       <input
         type="text"
-        placeholder="Search by position, hospital..."
-        className="border p-2 rounded-lg w-full"
+        name="search"
+        value={filters.search}
+        onChange={handleChange}
+        placeholder="Search Position / Hospital"
+        className="border rounded-lg px-3 py-2 flex-1 min-w-[250px]"
       />
- 
-      <input type="date" className="border p-2 rounded-lg" />
-      <input type="date" className="border p-2 rounded-lg" />
-      <button className="px-4 py-2 bg-gray-100 rounded-lg">
-        Reset
-      </button>
 
-      <button className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+      <input
+        type="date"
+        name="fromDate"
+        value={filters.fromDate}
+        onChange={handleChange}
+        className="border rounded-lg px-3 py-2"
+      />
+
+      <input
+        type="date"
+        name="toDate"
+        value={filters.toDate}
+        onChange={handleChange}
+        className="border rounded-lg px-3 py-2"
+      />
+
+      <button
+        onClick={onSearch}
+        className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+      >
         Search
       </button>
 
-      <button className="px-4 py-2 bg-green-600 text-white rounded-lg">
+      <button
+        onClick={onReset}
+        className="bg-gray-200 px-5 py-2 rounded-lg"
+      >
+        Reset
+      </button>
+
+      <button  
+        onClick={() => {
+      console.log("Export Clicked");
+      onExport();
+    }}
+        className="bg-red-500 text-white px-5 py-2 rounded-lg"
+      >
         Export
       </button>
 

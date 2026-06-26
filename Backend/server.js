@@ -28,6 +28,7 @@ app.use("/api/candidates", candidateRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/employees",employeeRoutes);
 app.use("/api/applications",applicationRoutes);
+app.use("/api/jobs", require("./routes/jobRoutes"));
 
 // Server
 const PORT = 5000;
