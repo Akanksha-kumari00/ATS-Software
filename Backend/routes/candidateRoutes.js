@@ -154,26 +154,52 @@ router.get("/stats", async (req, res) => {
 // =======================
 // Get Shortlisted Candidates
 // =======================
+// =======================
+// Get Candidates For Interview Schedule
+// =======================
 router.get("/shortlisted", async (req, res) => {
   try {
-    const [result] = await db.query(
-      `
+    const [result] = await db.query(`
       SELECT
-      id,
-      candidate_name,
-      specialization
+        id,
+        recruiter_name,
+        candidate_name,
+        education,
+        specialization,
+        mobile,
+        email,
+        hospital_name,
+        hospital_location,
+        cv_forward_date,
+        salary_expectation,
+        status,
+        interview_status,
+        interview_date,
+        interview_time,
+        remarks
       FROM candidates
-      WHERE status = 'Shortlisted'
+    WHERE
+(
+    status IN ('CV Shared','Shortlisted','Interview','Upcoming')
+)
+AND
+(
+    interview_status IS NULL
+    OR interview_status IN ('Pending','Upcoming','Confirmed')
+)
       ORDER BY candidate_name ASC
-      `
-    );
+    `);
+
     res.json(result);
-  }
-  catch (err) {
+
+  } catch (err) {
+
     console.error(err);
+
     res.status(500).json({
-      message: err.message
+      message: err.message,
     });
+
   }
 });
 // =======================

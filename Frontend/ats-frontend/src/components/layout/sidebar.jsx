@@ -21,7 +21,7 @@ function Sidebar({ sidebarOpen }) {
     { name: "Candidates", icon: <FaUsers />, path: "/candidates" },
     { name: "Applications", icon: <FaClipboardList />, path: "/applications" },
     { name: "Interviews", icon: <FaCalendarAlt />, path: "/interview" },
-    { name: "Offers", icon: <FaGift />, path: "/offers" },
+    { name: "Clients", icon: <FaGift />, path: "/clients" },
     { name: "Employees", icon: <FaUserTie />, path: "/employees" },
     { name: "Reports", icon: <FaFileAlt />, path: "/reports" },
     { name: "Resume Bank", icon: <FaFilePdf />, path: "/resumebank" },

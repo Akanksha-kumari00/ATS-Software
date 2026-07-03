@@ -150,12 +150,19 @@ const navigate = useNavigate();
                 <option>Selected</option>
                 <option>Rejected</option>
               </select>
-              <input
+             <select
                 name="interview_status"
-                placeholder="Interview Status"
+                value={formData.interview_status}
                 onChange={handleChange}
-                className="border p-3 rounded-xl"
-              />
+                className="border p-3 rounded-xl w-full"
+              >
+            <option value="">Select Interview Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Upcoming">Upcoming</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
               <input
                 type="date"
                 name="interview_date"

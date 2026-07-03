@@ -135,4 +135,18 @@ router.put("/:id", async (req, res) => {
     });
   }
 });
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await db.query("DELETE FROM employees WHERE id = ?", [id]);
+
+    res.json({
+      success: true,
+      message: "Employee deleted successfully",
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 module.exports = router;

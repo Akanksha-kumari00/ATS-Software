@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {getApplications,deleteApplication,updateApplication}from "../../services/applicationService";
-
 import Sidebar from "../../components/layout/sidebar";
 import Topbar from "../../components/layout/Topbar";
 import ApplicationFilters from "../../components/Applications/ApplicationFilters";
@@ -15,6 +14,12 @@ function ApplicationsPage() {
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [viewOpen, setViewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [filters, setFilters] = useState({
+  search: "",
+  dateRange: "",
+  hospital: "",
+  status: "",
+});
   const [applications, setApplications] = useState([]);
   useEffect(() => {
   loadApplications();
@@ -64,19 +69,77 @@ function ApplicationsPage() {
           }
         };
 
-      const handleExport = () => {
-        exportApplications([
-          {
-            name: "Dr Rahul Sharma",
-            email: "rahul.sharma@gmail.com",
-            phone: "9876543210",
-            hospital: "Apollo Hospitals, Delhi",
-            date: "17 Jun 2026",
-            status: "New",
-            recruiter: "Amit Verma",
-          },
-        ]);
-      };
+     const handleExport = () => {
+      exportApplications(
+    filteredApplications.map((app) => ({
+      name: app.candidate_name,
+      email: app.email,
+      phone: app.mobile,
+      hospital: app.hospital_name,
+      date: app.cv_forward_date
+        ? new Date(app.cv_forward_date).toLocaleDateString("en-GB")
+        : "",
+      status: app.status,
+      recruiter: app.recruiter_name,
+    }))
+  );
+};
+      const filteredApplications = applications.filter((app) => {
+
+    const search = filters.search.toLowerCase();
+
+    const matchSearch =
+        app.candidate_name?.toLowerCase().includes(search) ||
+        app.email?.toLowerCase().includes(search) ||
+        app.mobile?.includes(search);
+
+    const matchHospital =
+        !filters.hospital ||
+        app.hospital_name === filters.hospital;
+
+    const matchStatus =
+        !filters.status ||
+        app.status === filters.status;
+
+    let matchDate = true;
+
+    if (filters.dateRange) {
+
+        const today = new Date();
+
+        const appDate = new Date(app.cv_forward_date);
+
+        if (filters.dateRange === "today") {
+
+            matchDate =
+                appDate.toDateString() === today.toDateString();
+
+        }
+
+        if (filters.dateRange === "week") {
+
+            const weekAgo = new Date();
+
+            weekAgo.setDate(today.getDate() - 7);
+
+            matchDate = appDate >= weekAgo;
+        }
+
+        if (filters.dateRange === "month") {
+
+            matchDate =
+                appDate.getMonth() === today.getMonth() &&
+                appDate.getFullYear() === today.getFullYear();
+        }
+    }
+
+    return (
+        matchSearch &&
+        matchHospital &&
+        matchStatus &&
+        matchDate
+    );
+});
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
@@ -88,12 +151,15 @@ function ApplicationsPage() {
         />
         <div className="p-3 space-y-5">
           <ApplicationFilters
-           onExport={handleExport}
+            filters={filters}
+            setFilters={setFilters}
+            hospitals={[...new Set(applications.map(a => a.hospital_name))]}
+            onExport={handleExport}
           />
           <ApplicationStats />
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <ApplicationTable 
-              applications={applications}
+              applications={filteredApplications}
               onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}
@@ -107,7 +173,7 @@ function ApplicationsPage() {
                   open={editOpen}
                   onClose={() => setEditOpen(false)}
                   application={selectedApplication}
-                    onSave={handleSave}
+                  onSave={handleSave}
                 />
             <div className="p-3 border-t">
              <ApplicationPagination />

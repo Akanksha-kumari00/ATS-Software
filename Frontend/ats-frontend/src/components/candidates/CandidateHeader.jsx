@@ -1,6 +1,10 @@
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-function CandidateHeader({ search, setSearch }) {
+function CandidateHeader({
+  search,
+  setSearch,
+  onExport,
+}) {
   const navigate = useNavigate();
   return (
     <div className="flex justify-between items-center mb-2">
@@ -16,6 +20,7 @@ function CandidateHeader({ search, setSearch }) {
       </div>
       <div className="flex gap-3">
         <button
+          onClick={onExport}
           className="border px-4 py-2 rounded-xl"
         >
           Export

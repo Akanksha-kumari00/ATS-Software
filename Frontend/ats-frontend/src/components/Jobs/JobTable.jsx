@@ -1,4 +1,10 @@
-export default function JobTable({ jobs = [] }) {
+export default function JobTable({ 
+  jobs = [],
+  onView,
+  onEdit,
+  onDelete,
+}) {
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <div className="overflow-x-auto">
@@ -26,8 +32,11 @@ export default function JobTable({ jobs = [] }) {
               <th className="w-[80px] px-2 py-3 text-center text-xs font-semibold uppercase">
                 Opening
               </th>
+              <th className="w-[140px] px-2 py-3 text-left text-xs font-semibold uppercase">
+                Hospital Contact
+              </th>
               <th className="w-[120px] px-2 py-3 text-center text-xs font-semibold uppercase">
-                Accommodation
+                 Accommodation
               </th>
               <th className="w-[90px] px-2 py-3 text-center text-xs font-semibold uppercase">
                 Recruiter
@@ -75,15 +84,28 @@ export default function JobTable({ jobs = [] }) {
                     <div className="font-medium leading-4">
                       ₹{Number(job.min_salary).toLocaleString()}
                     </div>
-
                     <div className="text-[10px] text-gray-500 leading-4">
                       to ₹{Number(job.max_salary).toLocaleString()}
                     </div>
                 </td>
-                <td className="w-[95px] px-2 py-2 text-center text-[12px] whitespace-nowrap">
+                <td className="w-[90px] px-2 py-2 text-center text-[12px] whitespace-nowrap">
                   {new Date(job.opening_date).toLocaleDateString("en-IN")}
                 </td>
-                <td className="px-2 py-2 text-center">
+                <td className="w-[190px] px-2 py-2">
+                  <div className="font-semibold text-gray-900 leading-4">
+                    {job.contact_person}
+                  </div>
+                  <div className="text-[11px] text-indigo-600 leading-4">
+                    {job.contact_designation}
+                  </div>
+                  <div className="text-[11px] text-blue-600 leading-4">
+                    📞 {job.mobile}
+                  </div>
+                    <div className="text-[11px] text-gray-500 leading-4 truncate">
+                      ✉ {job.email}
+                    </div>
+                  </td>
+               <td className="px-2 py-2 text-center">
                   {job.accommodation}
                 </td>
                 <td className="px-2 py-2 text-center whitespace-nowrap">
@@ -105,20 +127,28 @@ export default function JobTable({ jobs = [] }) {
 
                 <td className="px-2 py-2">
                   <div className="flex items-center justify-center gap-1">
-                    <button className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-blue-100 transition">
-                      👁
-                    </button>
-                    <button className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-yellow-100 transition">
-                      ✏️
-                    </button>
-                    <button className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-red-100 transition">
-                      🗑
-                    </button>
+                  <button
+                      onClick={() => onView(job)}
+                    className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-blue-100"
+                  >
+                    👁
+                  </button>
+                  <button
+                      onClick={() => onEdit(job)}
+                    className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-yellow-100"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                   onClick={() => onDelete(job.id)}
+                    className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-red-100"
+                      >
+                        🗑
+                      </button>
                   </div>
                 </td>
               </tr>
             ))}
-
             {jobs.length === 0 && (
               <tr>
                 <td

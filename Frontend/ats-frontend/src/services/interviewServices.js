@@ -14,6 +14,15 @@ export const updateInterviewStatus = (id, status) => {
 
   );
 };
+export const getScheduleCandidates = () => {
+  return axios.get(
+    `${API}/interviews/schedule-candidates`
+  );
+};
+export const getInterviewStats = () => {
+  return axios.get(`${API}/interviews/stats`);
+};
+
 export const scheduleInterview = (
   id,
   data

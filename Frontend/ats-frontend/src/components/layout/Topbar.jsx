@@ -21,6 +21,8 @@ function Topbar({
         return "Interviews";
       case "/employees":
         return "Employees";
+      case "/jobs":
+         return "Position Section";
       default:
         return "ATS System";
     }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import EmployeeActionMenu from "../Employees/EmployeeActionMenu";
-export default function EmployeeTable({ employees, setEmployees }) {
+export default function EmployeeTable({ employees, setEmployees, }) {
   const emptyForm = {
     name: "",
     email: "",

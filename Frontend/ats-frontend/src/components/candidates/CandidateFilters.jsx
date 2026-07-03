@@ -30,6 +30,7 @@ function CandidateFilters() {
     };
     const handleMultiSelect = (value, field) => {
     const 
+    
     exists = filters[field].includes(value);
       if (exists) {
         setFilters({
@@ -53,6 +54,7 @@ function CandidateFilters() {
      setFilters(initialState);
     };
   return (
+
       <div className="bg-white rounded-2xl shadow p-5">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2">
@@ -159,7 +161,7 @@ function CandidateFilters() {
                   open.location
                   ?
                   <FaChevronUp />
-                       :
+                    :
                   <FaChevronDown />
                 }
              </div>

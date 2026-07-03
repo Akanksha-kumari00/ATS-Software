@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
-
 const jobController = require("../controllers/jobController");
-
 router.get("/stats", jobController.getJobStats);
 router.get("/", jobController.getJobs);
-
+router.get("/:id", jobController.getJobById);
+router.delete("/:id", jobController.deleteJob);
+router.put("/:id", jobController.updateJob);
+router.post("/", jobController.createJob);
 module.exports = router;

@@ -1,8 +1,6 @@
+
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+export default axios.create({
+  baseURL: "http://localhost:5000/api", // apne backend ke hisab se port change karo
 });
-
-export default api;
-

@@ -5,6 +5,8 @@ const candidateRoutes = require("./routes/candidateRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const employeeRoutes = require("./routes/employeeRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
+const hospitalRoutes = require("./routes/hospitalRoutes");
+
 
 
 const app = express();
@@ -29,6 +31,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/employees",employeeRoutes);
 app.use("/api/applications",applicationRoutes);
 app.use("/api/jobs", require("./routes/jobRoutes"));
+app.use("/api/hospitals", hospitalRoutes);
 
 // Server
 const PORT = 5000;

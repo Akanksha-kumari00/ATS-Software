@@ -68,13 +68,16 @@ return(
                         className="w-full border p-3 rounded-lg"
                 >
                     <option>
+                        upcoming
+                    </option>
+                    <option>
                         CV Shared
                     </option>
                     <option>
                          Shortlisted
                     </option>
                     <option>
-                        Interview
+                        Interview 
                     </option>
                     <option>
                         Selected
