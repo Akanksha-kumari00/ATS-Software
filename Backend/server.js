@@ -6,6 +6,7 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const employeeRoutes = require("./routes/employeeRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
 const hospitalRoutes = require("./routes/hospitalRoutes");
+const resumeRoutes = require("./routes/resumeRoutes");
 
 
 
@@ -32,6 +33,7 @@ app.use("/api/employees",employeeRoutes);
 app.use("/api/applications",applicationRoutes);
 app.use("/api/jobs", require("./routes/jobRoutes"));
 app.use("/api/hospitals", hospitalRoutes);
+app.use("/api/resume", resumeRoutes);
 
 // Server
 const PORT = 5000;

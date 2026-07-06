@@ -9,7 +9,7 @@ import Employees from "./Pages/Employees/Employees";
 import Application from "./Pages/Application";
 import Jobs from "./Pages/JobPositions/JobPositionsPage";
 import HospitalClients from "./Pages/HospitalClients/HospitalClientsPage";
-
+import ResumeBank from "./Pages/ResumeBank/ResumeBank";
 function App() {
   return (
     <BrowserRouter>
@@ -23,6 +23,8 @@ function App() {
         <Route path="/employees" element={<Employees />} />
         <Route path="/jobs" element={<Jobs/>}/>
         <Route path="/clients" element={<HospitalClients/>}/>
+        <Route path="/resumebank" element={<ResumeBank/>}/>
+      
       </Routes>
     </BrowserRouter>
   );

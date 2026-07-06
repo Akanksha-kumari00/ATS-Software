@@ -7,7 +7,6 @@ import {
 } from "react-icons/fa";
 
 function CandidateFilters() {
-
     const initialState = {
         speciality: "",
         experience: "",
@@ -21,7 +20,6 @@ function CandidateFilters() {
         location: true,
         hiring: true
       });
-
     const toggleSection = (name) => {
       setOpen({
         ...open,
@@ -29,9 +27,7 @@ function CandidateFilters() {
       });
     };
     const handleMultiSelect = (value, field) => {
-    const 
-    
-    exists = filters[field].includes(value);
+    const exists = filters[field].includes(value);
       if (exists) {
         setFilters({
           ...filters,
@@ -178,7 +174,7 @@ function CandidateFilters() {
                           <label
                             key={city}
                             className="flex gap-2"
-                      >
+                    >
                               <input
                                 type="checkbox"
                                 checked={filters.location.includes(city)}

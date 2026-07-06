@@ -133,11 +133,11 @@ const navigate = useNavigate();
                 className="border p-3 rounded-xl"
               />
                <input
-                name="salary_expectation"
-                placeholder="Experience"
-                onChange={handleChange}
-                className="border p-3 rounded-xl"
-              />
+                  name="experience"
+                  placeholder="Experience"
+                  onChange={handleChange}
+                  className="border p-3 rounded-xl"
+                />
               <select
                 name="status"
                 onChange={handleChange}
@@ -175,6 +175,7 @@ const navigate = useNavigate();
                 onChange={handleChange}
                 className="border p-3 rounded-xl"
               />
+              
               <div className="col-span-2">
                 <input
                   type="file"

@@ -4,14 +4,14 @@ import Topbar from "../../components/layout/Topbar";
 import CandidateHeader from "../../components/candidates/CandidateHeader";
 import CandidateFilters from "../../components/candidates/CandidateFilters";
 import CandidateTable from "../../components/candidates/CandidateTable";
-import { getCandidates } from "../../services/candidateService";
+import CandidateDetails from "../../components/candidates/CandidateDetails";
+import { getCandidates, deleteCandidate } from "../../services/candidateService";
 import { exportCandidates } from "../../utils/exportCandidates";
-
 function Candidates() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [candidates, setCandidates] = useState([]);
   const [search, setSearch] = useState("");
-  const [ setSelectedCandidate] = useState(null);
+ const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [filters, setFilters] = useState({
     speciality: "",
     experience: "",
@@ -71,8 +71,8 @@ function Candidates() {
       hospitalLocation: c.hospital_location,
       interviewStatus: c.interview_status,
       interviewDate: c.interview_date
-        ? new Date(c.interview_date).toLocaleDateString("en-GB")
-        : "",
+      ? new Date(c.interview_date).toLocaleDateString("en-GB")
+      : "",
       interviewTime: c.interview_time || "",
       salary: c.salary_expectation,
       experience: c.experience,
@@ -80,7 +80,32 @@ function Candidates() {
     }))
   );
 };
+const handleScheduleInterview = (candidate) => {
+  console.log("Schedule Interview", candidate);
+};
+const handleSendMail = (candidate) => {
+  console.log("Send Mail", candidate);
+};
+const handleDelete = async (id) => {
 
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this candidate?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    await deleteCandidate(id);
+    setCandidates((prev) =>
+      prev.filter((c) => c.id !== id)
+    );
+    alert("Candidate deleted successfully.");
+  } catch (err) {
+    console.log(err);
+    alert("Delete failed.");
+  }
+
+};
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
       <Sidebar sidebarOpen={sidebarOpen} />
@@ -108,7 +133,16 @@ function Candidates() {
               <CandidateTable
                 candidates={filteredCandidates}
                 setSelectedCandidate={setSelectedCandidate}
+                onDelete={handleDelete}
+                onScheduleInterview={handleScheduleInterview}
+                onSendMail={handleSendMail}
               />
+              {selectedCandidate && (
+                <CandidateDetails
+                  candidate={selectedCandidate}
+                  onClose={() => setSelectedCandidate(null)}
+                />
+              )}
             </div>
           </div>
         </div>

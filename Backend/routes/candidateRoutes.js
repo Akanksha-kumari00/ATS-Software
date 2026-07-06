@@ -5,7 +5,7 @@ const db = require("../config/db");
 const multer = require("multer");
 // =======================
 // Multer Configuration
-// =======================
+// ====================
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
@@ -34,11 +34,98 @@ router.get("/", async (req, res) => {
 });
 // =======================
 // Add Candidate
+/*const formatDateTime = (date) => {
+          if (!date) return null;
+          return new Date(date)
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
+        };*/
 // =======================
-router.post("/",upload.single("cv"),
-  async (req, res) => {
-    try {
-      const {
+// =======================
+// Add Candidate
+// =======================
+router.post("/", upload.single("cv"), async (req, res) => {
+  try {
+    let {
+      recruiter_name,
+      candidate_name,
+      education,
+      specialization,
+      mobile,
+      email,
+      hospital_name,
+      hospital_location,
+      cv_forward_date,
+      salary_expectation,
+      experience,  
+      status,
+      interview_status,
+      remarks,
+      interview_date,
+      interview_time,
+    } = req.body;
+
+    // Convert empty values to NULL
+    remarks = remarks || null;
+    interview_date = interview_date || null;
+    interview_time = interview_time || null;
+
+    const cv_name = req.file ? req.file.originalname : null;
+    const cv_path = req.file ? req.file.path : null;
+
+    // =======================
+    // Duplicate Check
+    // =======================
+
+    const errors = [];
+
+    if (candidate_name) {
+      const [rows] = await db.query(
+        "SELECT id FROM candidates WHERE candidate_name = ?",
+        [candidate_name]
+      );
+
+      if (rows.length) {
+        errors.push("Candidate name already exists");
+      }
+    }
+
+    if (mobile) {
+      const [rows] = await db.query(
+        "SELECT id FROM candidates WHERE mobile = ?",
+        [mobile]
+      );
+
+      if (rows.length) {
+        errors.push("Mobile number already exists");
+      }
+    }
+
+    if (email) {
+      const [rows] = await db.query(
+        "SELECT id FROM candidates WHERE email = ?",
+        [email]
+      );
+
+      if (rows.length) {
+        errors.push("Email already exists");
+      }
+    }
+
+    if (errors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: errors.join(", "),
+      });
+    }
+
+    // =======================
+    // Insert Candidate
+    // =======================
+
+    const sql = `
+      INSERT INTO candidates(
         recruiter_name,
         candidate_name,
         education,
@@ -47,29 +134,25 @@ router.post("/",upload.single("cv"),
         email,
         hospital_name,
         hospital_location,
+        cv_name,
+        cv_path,
         cv_forward_date,
         salary_expectation,
+        experience,  
         status,
         interview_status,
         remarks,
         interview_date,
         interview_time
-      } = req.body;
-      const cv_name = req.file
-        ? req.file.originalname
-        : null;
-      const cv_path = req.file
-        ? req.file.path
-        : null;
-        const formatDateTime = (date) => {
-          if (!date) return null;
-          return new Date(date)
-            .toISOString()
-            .slice(0, 19)
-            .replace("T", " ");
-        };
-      const sql = `
-      INSERT INTO candidates(
+      )
+      VALUES(
+        ?,?,?,?,?,?,
+        ?,?,?,?,?,?,
+        ?,?,?,?,?,?
+      )
+    `;
+
+    const [result] = await db.query(sql, [
       recruiter_name,
       candidate_name,
       education,
@@ -82,53 +165,55 @@ router.post("/",upload.single("cv"),
       cv_path,
       cv_forward_date,
       salary_expectation,
+        experience,  
       status,
       interview_status,
       remarks,
       interview_date,
-      interview_time
-      )
-      VALUES(
-      ?,?,?,?,?,?,
-      ?,?,?,?,?,?,
-      ?,?,?,?,?
-      )
-      `;
-      const [result] = await db.query(
-        sql,
+      interview_time,
+    ]);
+
+    // =======================
+    // Resume Bank
+    // =======================
+
+    if (req.file) {
+      await db.query(
+        `INSERT INTO resume_bank
+        (candidate_name, mobile, specialization, resume_file)
+        VALUES (?, ?, ?, ?)`,
         [
-          recruiter_name,
           candidate_name,
-          education,
-          specialization,
           mobile,
-          email,
-          hospital_name,
-          hospital_location,
-          cv_name,
+          specialization,
           cv_path,
-          cv_forward_date,
-          salary_expectation,
-          status,
-          interview_status,
-          remarks,
-          interview_date,
-          interview_time
         ]
       );
-      res.status(201).json({
-        message: "Candidate Added Successfully",
-        id: result.insertId
+    }
+
+    res.status(201).json({
+      success: true,
+      message: "Candidate Added Successfully",
+      id: result.insertId,
+    });
+
+  } catch (err) {
+
+    if (err.code === "ER_DUP_ENTRY") {
+      return res.status(400).json({
+        success: false,
+        message: "Duplicate data found.",
       });
     }
-    catch (err) {
-      console.error(err);
-      res.status(500).json({
-        message: err.message
-      });
-    }
+
+    console.error("Candidate Insert Error:", err);
+
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
   }
-);
+});
 // Application stats
 router.get("/stats", async (req, res) => {
   try {
@@ -230,42 +315,6 @@ router.get("/:id", async (req, res) => {
 // =======================
 // Update Candidate
 // =======================
-/*router.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const {
-      status,
-      interview_status,
-      remarks
-    } = req.body;
-    await db.query(
-      `
-      UPDATE candidates
-      SET
-      status=?,
-      interview_status=?,
-      remarks=?
-      WHERE id=?
-      `,
-      [
-        status,
-        interview_status,
-        remarks,
-        id
-      ]
-    );
-      res.json({
-        message: "Candidate Updated Successfully"
-      });
-    }
-
-      catch (err) {
-        console.error(err);
-        res.status(500).json({
-          message: err.message
-        });
-      }
-    });*/
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -363,4 +412,4 @@ router.delete("/:id", async (req, res) => {
     });
   }
 });
-module.exports = router;
+module.exports = router; 

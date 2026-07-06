@@ -30,25 +30,9 @@ export const addCandidate = async (formData) => {
     throw error;
   }
 };
-    //DELETE
+
+
 export const deleteCandidate = async (id) => {
-
-  try {
-
-    await axios.delete(
-
-      `${API}/${id}`
-
-    );
-
-  }
-
-  catch(error){
-
-    console.log(error);
-
-    throw error;
-
-  }
-
+  const res = await axios.delete(`${API}/${id}`);
+  return res.data;
 };
