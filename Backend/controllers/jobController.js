@@ -16,7 +16,7 @@ exports.getJobStats = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
+// GET a job
 exports.getJobs = async (req, res) => {
   try {
     const { search, fromDate, toDate } = req.query;
@@ -30,15 +30,13 @@ exports.getJobs = async (req, res) => {
         h.contact_person,
         h.contact_designation,
         h.mobile,
-        h.email,
-        u.name AS recruiter_name
+        h.email
       FROM job_positions jp
       LEFT JOIN clients_hospitals h
         ON jp.hospital_id = h.id
-      LEFT JOIN users u
-        ON jp.recruiter_id = u.id
       WHERE 1=1
     `;
+
     const params = [];
     if (search) {
       sql += `
@@ -122,6 +120,8 @@ exports.updateJob = async (req, res) => {
     const {
       position_title,
       specialization,
+      hospital_id,
+      recruiter_name,
       vacancies,
       min_experience,
       max_experience,
@@ -129,13 +129,21 @@ exports.updateJob = async (req, res) => {
       max_salary,
       accommodation,
       opening_date,
-      status
+      status,
     } = req.body;
+    let formattedDate = opening_date;
 
+if (opening_date) {
+  formattedDate = new Date(opening_date)
+    .toISOString()
+    .split("T")[0];
+}
     await db.query(
       `UPDATE job_positions SET
         position_title=?,
         specialization=?,
+        hospital_id=?,
+        recruiter_name=?,
         vacancies=?,
         min_experience=?,
         max_experience=?,
@@ -144,40 +152,46 @@ exports.updateJob = async (req, res) => {
         accommodation=?,
         opening_date=?,
         status=?
-        WHERE id=?`,
+      WHERE id=?`,
       [
         position_title,
         specialization,
+        hospital_id,
+        recruiter_name,
         vacancies,
         min_experience,
         max_experience,
         min_salary,
         max_salary,
         accommodation,
-        opening_date,
+        formattedDate,
         status,
-        req.params.id
+        req.params.id,
       ]
     );
+
     res.json({
-      message: "Job Updated Successfully"
+      success: true,
+      message: "Job Updated Successfully",
     });
 
   } catch (err) {
+    console.error("Update Job Error:", err);
+
     res.status(500).json({
-      message: err.message
+      success: false,
+      message: err.message,
     });
   }
 };
-
+// Create job
 exports.createJob = async (req, res) => {
   try {
     const {
-      job_code,
       position_title,
       specialization,
       hospital_id,
-      recruiter_id,
+      recruiter_name,
       vacancies,
       min_experience,
       max_experience,
@@ -188,6 +202,21 @@ exports.createJob = async (req, res) => {
       status,
     } = req.body;
 
+    // Get last job code
+    const [[lastJob]] = await db.query(`
+      SELECT job_code
+      FROM job_positions
+      ORDER BY id DESC
+      LIMIT 1
+    `);
+
+    let job_code = "JOB001";
+
+    if (lastJob && lastJob.job_code) {
+      const lastNumber = parseInt(lastJob.job_code.replace("JOB", ""), 10);
+      job_code = `JOB${String(lastNumber + 1).padStart(3, "0")}`;
+    }
+
     await db.query(
       `INSERT INTO job_positions
       (
@@ -195,7 +224,7 @@ exports.createJob = async (req, res) => {
         position_title,
         specialization,
         hospital_id,
-        recruiter_id,
+        recruiter_name,
         vacancies,
         min_experience,
         max_experience,
@@ -211,7 +240,7 @@ exports.createJob = async (req, res) => {
         position_title,
         specialization,
         hospital_id,
-        recruiter_id,
+        recruiter_name,
         vacancies,
         min_experience,
         max_experience,
@@ -222,14 +251,17 @@ exports.createJob = async (req, res) => {
         status,
       ]
     );
+
     res.json({
       success: true,
       message: "Job Created Successfully",
+      job_code,
     });
 
   } catch (err) {
     console.log(err);
     res.status(500).json({
+      success: false,
       message: err.message,
     });
   }

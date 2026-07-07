@@ -122,10 +122,12 @@ const [viewHospital, setViewHospital] = useState(null);
               sidebarOpen={sidebarOpen}
               setSidebarOpen={setSidebarOpen}
             />
+
       <div className="flex-1 overflow-auto p-1">
         <HospitalHeader
           stats={stats}
           search={search}
+           hospitals={hospitals}
           setSearch={setSearch}
           filters={filters}
           setFilters={setFilters}

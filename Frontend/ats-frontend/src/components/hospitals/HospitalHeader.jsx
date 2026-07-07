@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 export default function HospitalHeader({
   stats,
+  hospitals = [],
   search,
   setSearch,
   filters,
@@ -56,7 +57,17 @@ export default function HospitalHeader({
       bg: "bg-yellow-100",
     },
   ];
+const states = [...new Set(
+  hospitals
+    .map(h => h.state)
+    .filter(Boolean)
+)];
 
+const cities = [...new Set(
+  hospitals
+    .map(h => h.city)
+    .filter(Boolean)
+)];
   return (
     <div className="space-y-3">
       {/* Stats */}
@@ -94,34 +105,47 @@ export default function HospitalHeader({
           {/* Search */}
           <div className="relative col-span-2">
             <Search
-              size={18}
-              className="absolute left-3 top-3 text-gray-400"
+              size={20}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
             />
             <input
               type="text"
               placeholder="Search Hospital..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full border rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full h-17 border rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
+
           <select
-            value={filters.state}
-            onChange={(e) =>
-              setFilters({ ...filters, state: e.target.value })
-            }
-            className="border rounded-xl px-3"
-          >
-            <option value="">All States</option>
-          </select>
+              value={filters.state}
+              onChange={(e) =>
+                setFilters({ ...filters, state: e.target.value })
+              }
+              className="border rounded-xl px-3"
+            >
+              <option value="">All States</option>
+
+              {states.map((state) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ))}
+            </select>
           <select
-            value={filters.city}
-            onChange={(e) =>
-              setFilters({ ...filters, city: e.target.value })
-            }
-            className="border rounded-xl px-3"
-          >
+              value={filters.city}
+              onChange={(e) =>
+                setFilters({ ...filters, city: e.target.value })
+              }
+              className="border rounded-xl px-3"
+            >
             <option value="">All Cities</option>
+
+            {cities.map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
           </select>
           <select
             value={filters.status}
@@ -133,6 +157,7 @@ export default function HospitalHeader({
             <option value="">All Status</option>
             <option>Active</option>
             <option>Inactive</option>
+            <option>Hold</option>
           </select>
           <div className="flex gap-3">
             <button
@@ -142,7 +167,17 @@ export default function HospitalHeader({
           <Plus size={18} />
           Add Hospital
         </button>
-            <button className="border rounded-xl px-4 hover:bg-slate-50">
+            <button
+              onClick={() => {
+                setSearch("");
+                setFilters({
+                  state: "",
+                  city: "",
+                  status: "",
+                });
+              }}
+              className="border rounded-xl px-4 hover:bg-slate-50"
+            >
               <RotateCcw size={16} />
             </button>
           </div>

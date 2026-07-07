@@ -7,7 +7,6 @@ import {
   FaCalendarAlt,
   FaGift,
   FaUserTie,
-  FaFileAlt,
   FaFilePdf,
   FaCog,
   FaSignOutAlt
@@ -23,7 +22,6 @@ function Sidebar({ sidebarOpen }) {
     { name: "Interviews", icon: <FaCalendarAlt />, path: "/interview" },
     { name: "Clients", icon: <FaGift />, path: "/clients" },
     { name: "Employees", icon: <FaUserTie />, path: "/employees" },
-    { name: "Reports", icon: <FaFileAlt />, path: "/reports" },
     { name: "Resume Bank", icon: <FaFilePdf />, path: "/resumebank" },
     { name: "Settings", icon: <FaCog />, path: "/settings" }
   ];

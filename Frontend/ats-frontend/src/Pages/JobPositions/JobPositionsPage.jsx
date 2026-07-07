@@ -6,13 +6,14 @@ import JobFilters from "../../components/jobs/JobFilters";
 import JobTable from "../../components/jobs/JobTable";
 import { exportJobs } from "../../utils/exportJobs";
 import ViewJobModal from "../../components/Jobs/ViewJobModal";
-import { getJobs, getJobStats , deleteJob, updateJob,createJob, } from "../../services/jobService";
+import { getJobs, getJobStats , deleteJob, updateJob,createJob,getHospitals,} from "../../services/jobService";
 import JobFormModal from "../../components/Jobs/JobFormModal";
 export default function JobPositionsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedJob, setSelectedJob] = useState(null);
   const [viewOpen, setViewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [hospitals, setHospitals] = useState([]);
   const [addOpen, setAddOpen] = useState(false);
   const [jobs, setJobs] = useState([]);
   const [stats, setStats] = useState({
@@ -82,9 +83,22 @@ export default function JobPositionsPage() {
           console.log(err);
         }
 };
+const fetchHospitals = async () => {
+  try {
+    const res = await getHospitals();
+    setHospitals(res.data);
+  } catch (err) {
+    console.log(err);
+  }
+};useEffect(() => {
+  fetchJobs();
+  fetchStats();
+  fetchHospitals();
+}, [fetchJobs, fetchStats]);
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
       <Sidebar sidebarOpen={sidebarOpen} />
+
       <div className="flex-1 overflow-y-auto">
         <Topbar
           sidebarOpen={sidebarOpen}
@@ -118,6 +132,7 @@ export default function JobPositionsPage() {
               <JobFormModal
                 open={addOpen}
                 mode="add"
+                 hospitals={hospitals}
                 onClose={() => setAddOpen(false)}
                 onSave={async (form) => {
                 try {
@@ -136,6 +151,7 @@ export default function JobPositionsPage() {
                       open={editOpen}
                       mode="edit"
                       job={selectedJob}
+                       hospitals={hospitals}
                       onClose={() => setEditOpen(false)}
                       onSave={async (form) => {
                         await updateJob(form.id, form);

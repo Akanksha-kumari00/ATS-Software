@@ -179,11 +179,11 @@ export default function AddHospitalModal({
             <select name="status" value={form.status} onChange={handleChange} className="border p-3 rounded-xl">
               <option>Active</option>
               <option>Inactive</option>
+              <option>Hold</option>
             </select>
 
             <input name="remarks" placeholder="Remarks" value={form.remarks} onChange={handleChange} className="border p-3 rounded-xl" />
           </div>
-
           {/* FOOTER */}
           <div className="flex justify-end gap-3 border-t pt-4">
             <button type="button" onClick={onClose} className="px-5 py-2 border rounded-xl">

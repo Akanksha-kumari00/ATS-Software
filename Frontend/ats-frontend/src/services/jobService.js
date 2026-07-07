@@ -12,4 +12,6 @@ export const deleteJob = (id) =>  axios.delete(`${API}/${id}`);
 
 export const updateJob = (id, data) => axios.put(`${API}/${id}`, data);
 
-export const createJob = (data) => axios.post(API, data);
+export const createJob = (data) => axios.post(API, data);export const getHospitals = () => {
+  return axios.get("http://localhost:5000/api/hospitals");
+};
