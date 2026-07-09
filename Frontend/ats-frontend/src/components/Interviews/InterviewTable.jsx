@@ -1,12 +1,10 @@
 import InterviewRow from "./InterviewRow";
-
 export default function InterviewTable({
   data = [],
   refreshData,
 }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mt-5 overflow-hidden">
-
       {/* Header */}
       <div className="flex justify-between items-center px-6 py-4 border-b bg-gray-50">
         <div>
@@ -48,42 +46,11 @@ export default function InterviewTable({
               ))
             ) : (
               <tr>
-              
               </tr>
             )}
-
           </tbody>
-
         </table>
-
       </div>
-
-      {/* Footer */}
-
-      <div className="flex justify-between items-center px-6 py-4 border-t">
-
-        <p className="text-sm text-gray-500">
-          Showing {data.length} Interviews
-        </p>
-
-        <div className="flex gap-2">
-
-          <button className="w-9 h-9 rounded-lg border hover:bg-gray-100">
-            1
-          </button>
-
-          <button className="w-9 h-9 rounded-lg border hover:bg-gray-100">
-            2
-          </button>
-
-          <button className="w-9 h-9 rounded-lg border hover:bg-gray-100">
-            3
-          </button>
-
-        </div>
-
-      </div>
-
     </div>
   );
 }

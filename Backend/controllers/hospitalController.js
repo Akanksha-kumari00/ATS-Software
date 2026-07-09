@@ -1,39 +1,56 @@
 const db = require("../config/db");
 
 // ========================
+//GET Hospital
 exports.getHospitals = async (req, res) => {
   try {
-    const [rows] = await db.query(`
-     SELECT
-    h.id,
-    h.client_code,
-    h.hospital_name,
-    h.hospital_owner,
-    h.hospital_type,
-    h.beds,
-    h.city,
-    h.state,
-    h.address,
-    h.contact_person,
-    h.contact_designation,
-    h.mobile,
-    h.email,
-    h.bde_name,
-    h.bde_percentage,
-    h.agreement_days,
-    h.agreement_date,
-    h.agreement_expiry,
-    h.payment_terms,
-    h.position_summary,
-    h.remarks,
-    h.status,
-    h.created_at,
-    h.updated_at
-FROM clients_hospitals h
-ORDER BY h.id DESC;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    // Total Records
+    const [[countResult]] = await db.query(`
+      SELECT COUNT(*) AS total
+      FROM clients_hospitals
     `);
+    const totalRecords = countResult.total;
+    // Paginated Data
+    const [rows] = await db.query(`
+      SELECT
+        h.id,
+        h.client_code,
+        h.hospital_name,
+        h.hospital_owner,
+        h.hospital_type,
+        h.beds,
+        h.city,
+        h.state,
+        h.address,
+        h.contact_person,
+        h.contact_designation,
+        h.mobile,
+        h.email,
+        h.bde_name,
+        h.bde_percentage,
+        h.agreement_days,
+        h.agreement_date,
+        h.agreement_expiry,
+        h.payment_terms,
+        h.position_summary,
+        h.remarks,
+        h.status,
+        h.created_at,
+        h.updated_at
+      FROM clients_hospitals h
+      ORDER BY h.id DESC
+      LIMIT ? OFFSET ?;
+    `, [limit, offset]);
 
-    res.json(rows);
+    res.json({
+      hospitals: rows,
+      totalRecords,
+      totalPages: Math.ceil(totalRecords / limit),
+      currentPage: page,
+    });
 
   } catch (err) {
     console.error("Hospital Error:", err);

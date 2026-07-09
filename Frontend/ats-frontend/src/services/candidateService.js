@@ -30,7 +30,24 @@ export const addCandidate = async (formData) => {
     throw error;
   }
 };
-
+// Update Candidate
+export const updateCandidate = async (id, formData) => {
+  try {
+    const response = await axios.put(
+      `${API}/${id}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 
 export const deleteCandidate = async (id) => {
   const res = await axios.delete(`${API}/${id}`);

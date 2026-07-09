@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
+import Pagination from "../../components/common/Pagination";
 import JobStats from "../../components/jobs/JobStats";
 import JobFilters from "../../components/jobs/JobFilters";
 import JobTable from "../../components/jobs/JobTable";
@@ -15,74 +16,59 @@ export default function JobPositionsPage() {
   const [editOpen, setEditOpen] = useState(false);
   const [hospitals, setHospitals] = useState([]);
   const [addOpen, setAddOpen] = useState(false);
+
   const [jobs, setJobs] = useState([]);
-  const [stats, setStats] = useState({
-    totalPositions: 0,
-    openPositions: 0,
-    onHoldPositions: 0,
-    closedPositions: 0,
-  });
-  const [filters, setFilters] = useState({
-    search: "",
-    fromDate: "",
-    toDate: "",
-  });
-    // Export 
-  const handleExport = () => {
-    console.log("Jobs:", jobs);
-    exportJobs(jobs);
-  };
-  // Fetch Jobs
-  const fetchJobs = useCallback(async () => {
-    try {
-      const res = await getJobs(filters);
-      setJobs(res.data);
-    } catch (err) {
-      console.error("Jobs Error :", err);
-    }
-  }, [filters]);
+const [page, setPage] = useState(1);
+const [limit] = useState(10);
+const [totalPages, setTotalPages] = useState(1);
+const [totalRecords, setTotalRecords] = useState(0);
 
-  // Fetch Stats
-  const fetchStats = useCallback(async () => {
-    try {
-      const res = await getJobStats();
-      setStats(res.data);
-    } catch (err) {
-      console.error("Stats Error :", err);
-    }
-  }, []);
+const [stats, setStats] = useState({
+  totalPositions: 0,
+  openPositions: 0,
+  onHoldPositions: 0,
+  closedPositions: 0,
+});
 
-  useEffect(() => {
-    fetchJobs();
-    fetchStats();
-  }, [fetchJobs, fetchStats]);
-        const handleReset = () => {
-          setFilters({
-            search: "",
-            fromDate: "",
-            toDate: "",
-          });
-        };
-          const handleView = (job) => {
-          setSelectedJob(job);
-          setViewOpen(true);
-          };
-         const handleEdit = (job) => {
-         setSelectedJob(job);
-         setEditOpen(true);
-          };
-        const handleDelete = async (id) => {
-        const ok = window.confirm(
-        "Are you sure you want to delete this Job?"
-              );
-        if (!ok) return;
-        try {
-          await deleteJob(id);
-          fetchJobs();
-        } catch (err) {
-          console.log(err);
-        }
+const [filters, setFilters] = useState({
+  search: "",
+  fromDate: "",
+  toDate: "",
+});
+
+// Export
+const handleExport = () => {
+  exportJobs(jobs);
 };
+
+// ================= Fetch Jobs =================
+const fetchJobs = useCallback(async () => {
+  try {
+    const res = await getJobs({
+      ...filters,
+      page,
+      limit,
+    });
+
+    setJobs(res.data.data);
+    setTotalPages(res.data.totalPages);
+    setTotalRecords(res.data.totalRecords);
+  } catch (err) {
+    console.error("Jobs Error:", err);
+  }
+}, [filters, page, limit]);
+
+// ================= Fetch Stats =================
+const fetchStats = useCallback(async () => {
+  try {
+    const res = await getJobStats();
+    setStats(res.data);
+  } catch (err) {
+    console.error("Stats Error:", err);
+  }
+}, []);
+
+// ================= Fetch Hospitals =================
 const fetchHospitals = async () => {
   try {
     const res = await getHospitals();
@@ -90,11 +76,54 @@ const fetchHospitals = async () => {
   } catch (err) {
     console.log(err);
   }
-};useEffect(() => {
+};
+
+// ================= Load Data =================
+useEffect(() => {
   fetchJobs();
   fetchStats();
   fetchHospitals();
 }, [fetchJobs, fetchStats]);
+
+// ================= Reset Filters =================
+const handleReset = () => {
+  setFilters({
+    search: "",
+    fromDate: "",
+    toDate: "",
+  });
+
+  setPage(1);
+};
+
+// ================= View =================
+const handleView = (job) => {
+  setSelectedJob(job);
+  setViewOpen(true);
+};
+
+// ================= Edit =================
+const handleEdit = (job) => {
+  setSelectedJob(job);
+  setEditOpen(true);
+};
+
+// ================= Delete =================
+const handleDelete = async (id) => {
+  const ok = window.confirm(
+    "Are you sure you want to delete this Job?"
+  );
+
+  if (!ok) return;
+
+  try {
+    await deleteJob(id);
+    fetchJobs();
+    fetchStats();
+  } catch (err) {
+    console.log(err);
+  }
+};
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
       <Sidebar sidebarOpen={sidebarOpen} />
@@ -118,12 +147,24 @@ const fetchHospitals = async () => {
                 onClose={() => setAddOpen(false)}
                 onSave={(data) => console.log(data)}
                 />
-                <JobTable
-                    jobs={jobs}
-                    onView={handleView}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
+                <div className="bg-white rounded-xl shadow">
+
+                  <JobTable
+                      jobs={jobs}
+                      onView={handleView}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
                   />
+
+                  <Pagination
+                      page={page}
+                      totalPages={totalPages}
+                      totalRecords={totalRecords}
+                      limit={limit}
+                      onPageChange={setPage}
+                  />
+
+              </div>
                 <ViewJobModal
                 open={viewOpen}
                 onClose={() => setViewOpen(false)}
@@ -160,6 +201,7 @@ const fetchHospitals = async () => {
                         fetchStats();
                       }}
                 />
+                
         </div>
       </div>
     </div>

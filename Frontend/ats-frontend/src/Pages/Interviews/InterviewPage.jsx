@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
+import Pagination from "../../components/common/Pagination";
 import InterviewFilters from "../../components/Interviews/InterviewFilters";
 import InterviewTable from "../../components/Interviews/InterviewTable";
 import InterviewStats from "../../components/Interviews/InterviewStats";
@@ -21,45 +22,50 @@ const [filters, setFilters] = useState({
   date: "",
   status: "",
 });
-const filteredInterviews = interviews.filter((item) => {
-  const search = filters.search.toLowerCase();
+const [page, setPage] = useState(1);
+const [limit] = useState(10);
 
+const [totalPages, setTotalPages] = useState(1);
+const [totalRecords, setTotalRecords] = useState(0);
+const filteredInterviews = interviews.filter((item) => {
+
+  const search = filters.search.toLowerCase();
+  
   const matchesSearch =
     item.candidate_name?.toLowerCase().includes(search) ||
     item.email?.toLowerCase().includes(search) ||
     item.mobile?.includes(search);
-
   const matchesStatus =
     !filters.status ||
     item.interview_status === filters.status;
-
-  const matchesDate =
-    !filters.date ||
-    item.interview_date?.slice(0, 10) === filters.date;
-
+ const matchesDate =
+  !filters.date ||
+  item.interview_date === filters.date;
   return (
     matchesSearch &&
     matchesStatus &&
     matchesDate
   );
-});
-const fetchData = async () => {
+  });
+
+const fetchData = useCallback(async () => {
   try {
     const [interviewRes, statsRes] = await Promise.all([
-      getInterviews(),
+      getInterviews(page, limit),
       getInterviewStats(),
     ]);
 
-    setInterviews(interviewRes.data);
+    setInterviews(interviewRes.data.interviews);
+    setTotalPages(interviewRes.data.totalPages);
+    setTotalRecords(interviewRes.data.totalRecords);
     setStats(statsRes.data);
   } catch (error) {
     console.log(error);
   }
-};
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+}, [page, limit]);
+useEffect(() => {
+  fetchData();
+}, [fetchData]);
   return (
       <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
       <Sidebar sidebarOpen={sidebarOpen} />
@@ -76,9 +82,16 @@ const fetchData = async () => {
               setFilters={setFilters}
             />
           <InterviewTable
-      data={filteredInterviews}
-    refreshData={fetchData}
-/>
+                  data={filteredInterviews}
+              refreshData={fetchData}
+            />
+           <Pagination
+              page={page}
+              totalPages={totalPages}
+              totalRecords={totalRecords}
+              limit={limit}
+              onPageChange={setPage}
+          />
           {openModal && (
             <ScheduleInterviewModal
               closeModal={() => setOpenModal(false)}

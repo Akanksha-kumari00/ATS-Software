@@ -120,6 +120,7 @@ function CandidateFilters() {
                     value={filters.experience}
                     onChange={(e)=>
                     setFilters({
+                      
                       ...filters,
                       experience:e.target.value
                     })}

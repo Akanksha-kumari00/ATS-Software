@@ -5,12 +5,35 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    // Total Records
+    const [[countResult]] = await db.query(`
+      SELECT COUNT(*) AS total
+      FROM employees
+    `);
+
+    const totalRecords = countResult.total;
     const [rows] = await db.query(
-      "SELECT * FROM employees"
+      `
+      SELECT *
+      FROM employees
+      ORDER BY id DESC
+      LIMIT ? OFFSET ?
+      `,
+      [limit, offset]
     );
-    res.json(rows);
-  }
-  catch (err) {
+
+    res.json({
+      employees: rows,
+      totalRecords,
+      totalPages: Math.ceil(totalRecords / limit),
+      currentPage: page,
+    });
+
+  } catch (err) {
     console.log(err);
     res.status(500).json({
       error: err.message,
@@ -19,59 +42,6 @@ router.get("/", async (req, res) => {
 });
 
 // UPDATE EMPLOYEE
-/*
-router.put("/:id", (req, res) => {
-  const { id } = req.params;
-  const {
-    name,
-    email,
-    phone_number,
-    job_profile,
-    working_position,
-    cv_forwarded,
-    interview_done,
-    joining_status
-  } = req.body;
-
-  const sql = `
-    UPDATE Employees SET
-      name=?,
-      email=?,
-      phone_number=?,
-      job_profile=?,
-      working_position=?,
-      cv_forwarded=?,
-      interview_done=?,
-      joining_status=?
-    WHERE id=?
-  `;
-
-  db.query(
-    sql,
-    [
-      name,
-      email,
-      phone_number,
-      job_profile,
-      working_position,
-      cv_forwarded,
-      interview_done,
-      joining_status,
-      id
-    ],
-    (err, result) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).send("Database Error");
-      }
-
-      res.send({
-        success: true,
-        message: "Employee updated successfully"
-      });
-    }
-  );
-});*/
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -149,4 +119,5 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json(err);
   }
 });
+
 module.exports = router;

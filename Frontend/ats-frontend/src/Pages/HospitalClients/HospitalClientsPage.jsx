@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
+import Pagination from "../../components/common/Pagination";
 import HospitalHeader from "../../components/hospitals/HospitalHeader";
 import AddHospitalModal from "../../components/hospitals/AddHospitalModal";
 import HospitalViewModal from "../../components/hospitals/HospitalViewModal";
@@ -21,28 +22,35 @@ export default function HospitalClients() {
     city: "",
     status: "",
   });
+const [page, setPage] = useState(1);
+const [limit] = useState(10);
 
- const loadHospitals = async () => {
+const [totalPages, setTotalPages] = useState(1);
+const [totalRecords, setTotalRecords] = useState(0);
+ const loadHospitals = useCallback(async () => {
   try {
     setLoading(true);
 
     const [hospitalRes, statsRes] = await Promise.all([
-      hospitalService.getHospitals(),
+      hospitalService.getHospitals(page, limit),
       hospitalService.getStats(),
     ]);
-    setHospitals(hospitalRes.data);
-    setStats(statsRes.data);
 
-    setLoading(false);
+    setHospitals(hospitalRes.data.hospitals);
+    setTotalPages(hospitalRes.data.totalPages);
+    setTotalRecords(hospitalRes.data.totalRecords);
+
+    setStats(statsRes.data);
   } catch (err) {
     console.error(err);
+  } finally {
     setLoading(false);
   }
-};
+}, [page, limit]);
 
 useEffect(() => {
   loadHospitals();
-}, []);
+}, [loadHospitals]);
   // Add / Update Hospital
  const handleSaveHospital = async (formData) => {
   try {
@@ -122,7 +130,6 @@ const [viewHospital, setViewHospital] = useState(null);
               sidebarOpen={sidebarOpen}
               setSidebarOpen={setSidebarOpen}
             />
-
       <div className="flex-1 overflow-auto p-1">
         <HospitalHeader
           stats={stats}
@@ -136,7 +143,6 @@ const [viewHospital, setViewHospital] = useState(null);
             setOpenModal(true);
           }}
         />
-
         <div className="p-2">
           <HospitalTable
                 hospitals={filteredHospitals}
@@ -144,6 +150,13 @@ const [viewHospital, setViewHospital] = useState(null);
                  onView={setViewHospital}
                 onEdit={handleEditHospital}
                 onDelete={handleDeleteHospital}
+            />
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              totalRecords={totalRecords}
+              limit={limit}
+              onPageChange={setPage}
             />
         </div>
         <AddHospitalModal
@@ -156,11 +169,10 @@ const [viewHospital, setViewHospital] = useState(null);
           onSave={handleSaveHospital}
         />
        <HospitalViewModal
-  open={!!viewHospital}
-  hospital={viewHospital}
-  onClose={() => setViewHospital(null)}
-/>
-          
+          open={!!viewHospital}
+          hospital={viewHospital}
+          onClose={() => setViewHospital(null)}
+        />
       </div>
     </div>
     </div>

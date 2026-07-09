@@ -3,6 +3,18 @@ const db = require("../config/db");
 // GET ALL SCHEDULED INTERVIEWS
 exports.getInterviews = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [[countResult]] = await db.query(`
+      SELECT COUNT(*) AS total
+      FROM candidates
+      WHERE interview_date IS NOT NULL
+    `);
+
+    const totalRecords = countResult.total;
+
     const [rows] = await db.query(`
       SELECT
         id,
@@ -12,7 +24,7 @@ exports.getInterviews = async (req, res) => {
         mobile,
         hospital_name,
         hospital_location,
-        interview_date,
+        DATE_FORMAT(interview_date, '%Y-%m-%d') AS interview_date,
         interview_time,
         interview_status,
         status
@@ -20,18 +32,24 @@ exports.getInterviews = async (req, res) => {
       WHERE interview_date IS NOT NULL
       ORDER BY
         CASE
-              WHEN interview_status = 'Upcoming' THEN 1
-              WHEN interview_status = 'Pending' THEN 2
-              WHEN interview_status = 'Confirmed' THEN 3
-              WHEN interview_status = 'Completed' THEN 4
-              WHEN interview_status = 'Cancelled' THEN 5
-              ELSE 6
+          WHEN interview_status = 'Completed' THEN 3
+          WHEN interview_status = 'Cancelled' THEN 4
+          WHEN interview_date = CURDATE() THEN 0
+          WHEN interview_date > CURDATE() THEN 1
+          ELSE 2
         END,
         interview_date ASC,
         interview_time ASC
-    `);
+      LIMIT ? OFFSET ?
+    `, [limit, offset]);
 
-    res.status(200).json(rows);
+    res.status(200).json({
+      interviews: rows,
+      totalRecords,
+      totalPages: Math.ceil(totalRecords / limit),
+      currentPage: page,
+    });
+
   } catch (error) {
     console.log(error);
     res.status(500).json({

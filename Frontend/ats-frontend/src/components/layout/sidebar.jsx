@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
 import {
   FaHome,
   FaBriefcase,
@@ -14,6 +15,7 @@ import {
 function Sidebar({ sidebarOpen }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const menu = [
     { name: "Dashboard", icon: <FaHome />, path: "/dashboard" },
     { name: "Jobs", icon: <FaBriefcase />, path: "/jobs" },
@@ -25,6 +27,10 @@ function Sidebar({ sidebarOpen }) {
     { name: "Resume Bank", icon: <FaFilePdf />, path: "/resumebank" },
     { name: "Settings", icon: <FaCog />, path: "/settings" }
   ];
+  const handleLogout = () => {
+  localStorage.removeItem("user");
+  navigate("/");
+};
   return (
     <div
       className={`
@@ -79,13 +85,50 @@ function Sidebar({ sidebarOpen }) {
       </div>
       <div className="border-t border-slate-800 p-3">
         <div
-          onClick={() => navigate("/")}
-          className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer hover:bg-red-600"
+          onClick={() => setShowLogoutModal(true)}
+          className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 hover:bg-red-600"
         >
           <FaSignOutAlt />
           {sidebarOpen && "Logout"}
         </div>
       </div>
+      {showLogoutModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="w-80 rounded-2xl bg-white p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+
+      <div className="flex justify-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+          <FaSignOutAlt className="text-3xl text-red-600" />
+        </div>
+      </div>
+
+      <h2 className="mt-4 text-center text-xl font-bold text-gray-800">
+        Logout
+      </h2>
+
+      <p className="mt-2 text-center text-sm text-gray-500">
+        Are you sure you want to logout from your account?
+      </p>
+
+      <div className="mt-6 flex gap-3">
+        <button
+          onClick={() => setShowLogoutModal(false)}
+         className="flex-1 rounded-lg border border-gray-300 bg-white py-2 font-medium text-gray-700 transition hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleLogout}
+          className="flex-1 rounded-lg bg-red-600 py-2 font-medium text-white transition hover:bg-red-700"
+        >
+          Logout
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
     </div>
   );
 }

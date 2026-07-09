@@ -10,16 +10,15 @@ import {
 export default function InterviewRow({
   item,
 }) {
+const formattedDate = new Date(
+  item.interview_date + "T00:00:00"
+).toLocaleDateString("en-GB", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+});
 
 
-
-  const formattedDate = new Date(
-    item.interview_date
-  ).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
 
   const formattedTime = new Date(
     `1970-01-01T${item.interview_time}`

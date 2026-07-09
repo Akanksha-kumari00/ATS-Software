@@ -12,11 +12,10 @@ function CandidateTable({
   onSendMail,
 }) {
   return (
-   <div className="bg-white rounded-xl shadow p-3">
-    <div className="relative">
-        <div className="overflow-x-auto">
+   <div className="bg-white rounded-xl shadow p-3 overflow-visible">
+  <div className="relative overflow-visible">
+    <div className="overflow-x-auto">
         <table className="min-w-[1250px] w-full text-sm">
-
           {/* HEADER */}
           <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
             <tr>
@@ -25,9 +24,9 @@ function CandidateTable({
               <th className="p-2 text-left">Hospital</th>
               <th className="p-2 text-left">Interview</th>
               <th className="p-2 text-left">Salary</th>
-              <th className="p-2 text-left">Exp</th>
-              <th className="p-2 text-left">CV</th>
-              <th className="p-2 text-left">Remarks</th>
+              <th className=" text-left">Exp</th>
+              <th className="p-3 text-left">CV</th>
+              <th className="text-left">Gender</th>
               <th className="p-2 text-center">Action</th>
             </tr>
           </thead>
@@ -86,11 +85,11 @@ function CandidateTable({
                   </p>
                 </td>
                 {/* Salary */}
-                <td className="p-2 font-medium">
+                <td className=" font-medium">
                   ₹{c.salary_expectation}
                 </td>
                 {/* Experience */}
-                <td className="p-2">
+                <td >
                   {c.experience}
                 </td>
                 {/* CV */}
@@ -112,9 +111,9 @@ function CandidateTable({
                     </span>
                   )}
                 </td>
-                {/* Remarks */}
-                <td className="p-2 text-xs text-gray-600 max-w-[170px] truncate">
-                  {c.remarks}
+                {/* Gender */}
+                <td className=" text-xs text-gray-600">
+                  {c.gender || "-"}
                 </td>
 
                 {/* Action */}
@@ -126,7 +125,7 @@ function CandidateTable({
                 <MenuButton className="p-2 rounded-lg hover:bg-gray-100">
                   <MoreVertical size={18} />
                 </MenuButton>
-                      <MenuItems className="absolute right-0 bottom-full mb-2 w-52 bg-white border rounded-xl shadow-xl z-[9999]">
+                      <MenuItems   anchor="bottom end" className=" mb-2 w-52 bg-white border rounded-xl shadow-xl z-[9999]">
                         <MenuItem>
                           {({ active }) => (
                             <button

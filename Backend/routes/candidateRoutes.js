@@ -32,16 +32,7 @@ router.get("/", async (req, res) => {
     });
   }
 });
-// =======================
-// Add Candidate
-/*const formatDateTime = (date) => {
-          if (!date) return null;
-          return new Date(date)
-            .toISOString()
-            .slice(0, 19)
-            .replace("T", " ");
-        };*/
-// =======================
+
 // =======================
 // Add Candidate
 // =======================
@@ -50,6 +41,7 @@ router.post("/", upload.single("cv"), async (req, res) => {
     let {
       recruiter_name,
       candidate_name,
+      gender,
       education,
       specialization,
       mobile,
@@ -128,6 +120,7 @@ router.post("/", upload.single("cv"), async (req, res) => {
       INSERT INTO candidates(
         recruiter_name,
         candidate_name,
+        gender,
         education,
         specialization,
         mobile,
@@ -148,13 +141,14 @@ router.post("/", upload.single("cv"), async (req, res) => {
       VALUES(
         ?,?,?,?,?,?,
         ?,?,?,?,?,?,
-        ?,?,?,?,?,?
+        ?,?,?,?,?,?,?
       )
     `;
 
     const [result] = await db.query(sql, [
       recruiter_name,
       candidate_name,
+      gender,
       education,
       specialization,
       mobile,
@@ -165,7 +159,7 @@ router.post("/", upload.single("cv"), async (req, res) => {
       cv_path,
       cv_forward_date,
       salary_expectation,
-        experience,  
+      experience,  
       status,
       interview_status,
       remarks,
@@ -249,6 +243,7 @@ router.get("/shortlisted", async (req, res) => {
         id,
         recruiter_name,
         candidate_name,
+        gender,
         education,
         specialization,
         mobile,
@@ -315,13 +310,16 @@ router.get("/:id", async (req, res) => {
 // =======================
 // Update Candidate
 // =======================
-router.put("/:id", async (req, res) => {
+router.put("/:id", upload.single("cv"), async (req, res) => {
+  console.log("BODY:", req.body);
+console.log("FILE:", req.file);
   try {
     const { id } = req.params;
     const {
       recruiter_name,
       candidate_name,
       education,
+      gender,
       specialization,
       mobile,
       email,
@@ -329,6 +327,7 @@ router.put("/:id", async (req, res) => {
       hospital_location,
       cv_forward_date,
       salary_expectation,
+       experience,
       status,
       interview_status,
       remarks,
@@ -341,6 +340,7 @@ router.put("/:id", async (req, res) => {
       SET
       recruiter_name=?,
       candidate_name=?,
+      gender=?,
       education=?,
       specialization=?,
       mobile=?,
@@ -349,6 +349,7 @@ router.put("/:id", async (req, res) => {
       hospital_location=?,
       cv_forward_date=?,
       salary_expectation=?,
+       experience=?,
       status=?,
       interview_status=?,
       remarks=?,
@@ -359,6 +360,7 @@ router.put("/:id", async (req, res) => {
       [
         recruiter_name,
         candidate_name,
+        gender,
         education,
         specialization,
         mobile,
@@ -367,6 +369,7 @@ router.put("/:id", async (req, res) => {
         hospital_location,
         cv_forward_date,
         salary_expectation,
+        experience,
         status,
         interview_status,
         remarks,
@@ -380,11 +383,16 @@ router.put("/:id", async (req, res) => {
     });
   }
   catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: err.message
-    });
-  }
+  console.log("========== ERROR ==========");
+  console.log(err);
+  console.log("SQL:", err.sqlMessage);
+  console.log("CODE:", err.code);
+
+  res.status(500).json({
+    message: err.message,
+    sql: err.sqlMessage,
+  });
+}
 });
 // =======================
 // Delete Candidate

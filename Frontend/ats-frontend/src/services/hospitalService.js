@@ -1,9 +1,9 @@
 import api from "./api";
 
 const hospitalService = {
-  getHospitals() {
-    return api.get("/hospitals");
-  },
+  getHospitals(page = 1, limit = 10) {
+  return api.get(`/hospitals?page=${page}&limit=${limit}`);
+},
 
   getStats() {
     return api.get("/hospitals/stats");

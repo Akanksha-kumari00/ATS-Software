@@ -237,23 +237,8 @@ export default function HospitalTable({
           </tbody>
         </table>
       </div>
-      {/* Footer */}
-      <div className="px-4 py-3 border-t flex justify-between items-center">
-        <p className="text-sm text-slate-500">
-          Showing <strong>{hospitals.length}</strong> hospitals
-        </p>
-        <div className="flex gap-1">
-          <button className="px-3 py-1.5 border rounded-md text-sm hover:bg-slate-50">
-            Previous
-          </button>
-          <button className="px-3 py-1.5 rounded-md bg-indigo-600 text-white text-sm">
-            1
-          </button>
-          <button className="px-3 py-1.5 border rounded-md text-sm hover:bg-slate-50">
-            Next
-          </button>
-        </div>
-      </div>
+
+      
     </div>
   );
 }

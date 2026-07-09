@@ -17,10 +17,76 @@ exports.getJobStats = async (req, res) => {
   }
 };
 // GET a job
+// GET Jobs with Pagination
 exports.getJobs = async (req, res) => {
   try {
-    const { search, fromDate, toDate } = req.query;
-    let sql = `
+    const {
+      search,
+      fromDate,
+      toDate,
+      page = 1,
+      limit = 10,
+    } = req.query;
+
+    const currentPage = parseInt(page);
+    const pageSize = parseInt(limit);
+    const offset = (currentPage - 1) * pageSize;
+
+    let whereClause = ` WHERE 1=1 `;
+    const params = [];
+
+    if (search) {
+      whereClause += `
+        AND (
+          jp.position_title LIKE ?
+          OR jp.specialization LIKE ?
+          OR h.hospital_name LIKE ?
+          OR h.contact_person LIKE ?
+          OR h.contact_designation LIKE ?
+          OR h.mobile LIKE ?
+          OR h.email LIKE ?
+        )
+      `;
+
+      params.push(
+        `%${search}%`,
+        `%${search}%`,
+        `%${search}%`,
+        `%${search}%`,
+        `%${search}%`,
+        `%${search}%`,
+        `%${search}%`
+      );
+    }
+
+    if (fromDate) {
+      whereClause += ` AND jp.opening_date >= ?`;
+      params.push(fromDate);
+    }
+
+    if (toDate) {
+      whereClause += ` AND jp.opening_date <= ?`;
+      params.push(toDate);
+    }
+
+    // Total Records
+    const [countRows] = await db.query(
+      `
+      SELECT COUNT(*) AS totalRecords
+      FROM job_positions jp
+      LEFT JOIN clients_hospitals h
+      ON jp.hospital_id = h.id
+      ${whereClause}
+      `,
+      params
+    );
+
+    const totalRecords = countRows[0].totalRecords;
+    const totalPages = Math.ceil(totalRecords / pageSize);
+
+    // Paginated Data
+    const [rows] = await db.query(
+      `
       SELECT
         jp.*,
         h.hospital_name,
@@ -33,70 +99,68 @@ exports.getJobs = async (req, res) => {
         h.email
       FROM job_positions jp
       LEFT JOIN clients_hospitals h
-        ON jp.hospital_id = h.id
-      WHERE 1=1
-    `;
+      ON jp.hospital_id = h.id
 
-    const params = [];
-    if (search) {
-      sql += `
-        AND (
-          jp.position_title LIKE ?
-          OR jp.specialization LIKE ?
-          OR h.hospital_name LIKE ?
-          OR h.contact_person LIKE ?
-          OR h.contact_designation LIKE ?
-          OR h.mobile LIKE ?
-          OR h.email LIKE ?
-        )
-      `;
-      params.push(
-        `%${search}%`,
-        `%${search}%`,
-        `%${search}%`,
-        `%${search}%`,
-        `%${search}%`,
-        `%${search}%`,
-        `%${search}%`
-      );
-    }
-    if (fromDate) {
-      sql += " AND jp.opening_date >= ?";
-      params.push(fromDate);
-    }
-    if (toDate) {
-      sql += " AND jp.opening_date <= ?";
-      params.push(toDate);
-    }
-    sql += " ORDER BY jp.id DESC";
-    const [rows] = await db.query(sql, params);
-    res.json(rows);
+      ${whereClause}
+
+      ORDER BY jp.id DESC
+      LIMIT ? OFFSET ?
+      `,
+      [...params, pageSize, offset]
+    );
+
+    res.json({
+      data: rows,
+      page: currentPage,
+      limit: pageSize,
+      totalRecords,
+      totalPages,
+    });
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: err.message,
+    });
   }
 };
-// Get Single Job
+// Get Single Job By ID
 exports.getJobById = async (req, res) => {
-  console.log("GET ID:", req.params.id);
-
   try {
     const [rows] = await db.query(
-      "SELECT * FROM job_positions WHERE id=?",
+      `
+      SELECT
+        jp.*,
+        h.hospital_name,
+        h.city,
+        h.state,
+        h.beds,
+        h.contact_person,
+        h.contact_designation,
+        h.mobile,
+        h.email
+      FROM job_positions jp
+      LEFT JOIN clients_hospitals h
+      ON jp.hospital_id = h.id
+      WHERE jp.id = ?
+      `,
       [req.params.id]
     );
 
-    console.log(rows);
     if (rows.length === 0) {
       return res.status(404).json({
-        message: "Job not found"
+        success: false,
+        message: "Job not found",
       });
     }
 
     res.json(rows[0]);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: err.message });
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 // Delete Job

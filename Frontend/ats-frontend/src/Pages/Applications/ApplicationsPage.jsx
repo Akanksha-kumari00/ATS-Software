@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import {getApplications,deleteApplication,updateApplication}from "../../services/applicationService";
 import Sidebar from "../../components/layout/sidebar";
 import Topbar from "../../components/layout/Topbar";
+import Pagination from "../../components/common/Pagination";
 import ApplicationFilters from "../../components/Applications/ApplicationFilters";
 import ApplicationStats from "../../components/Applications/ApplicationStats";
 import ApplicationTable from "../../components/Applications/ApplicationsTable";
-import ApplicationPagination from "../../components/Applications/ApplicationPagination";
 import { exportApplications } from "../../utils/exportApplications";
 import ViewApplicationModal from "../../components/Applications/ViewApplicationModal";
 import EditApplicationModal from "../../components/Applications/EditApplicationModal";
@@ -21,6 +21,8 @@ function ApplicationsPage() {
   status: "",
 });
   const [applications, setApplications] = useState([]);
+  const [page, setPage] = useState(1);
+const [limit] = useState(10);
   useEffect(() => {
   loadApplications();
 }, []);
@@ -84,49 +86,30 @@ function ApplicationsPage() {
     }))
   );
 };
-      const filteredApplications = applications.filter((app) => {
-
+    const filteredApplications = applications.filter((app) => {
     const search = filters.search.toLowerCase();
-
     const matchSearch =
         app.candidate_name?.toLowerCase().includes(search) ||
         app.email?.toLowerCase().includes(search) ||
         app.mobile?.includes(search);
-
-    const matchHospital =
-        !filters.hospital ||
-        app.hospital_name === filters.hospital;
-
-    const matchStatus =
-        !filters.status ||
+    const matchHospital = !filters.hospital ||
+      app.hospital_name === filters.hospital;
+    const matchStatus = !filters.status ||
         app.status === filters.status;
-
     let matchDate = true;
-
     if (filters.dateRange) {
-
         const today = new Date();
-
         const appDate = new Date(app.cv_forward_date);
-
         if (filters.dateRange === "today") {
-
             matchDate =
                 appDate.toDateString() === today.toDateString();
-
         }
-
         if (filters.dateRange === "week") {
-
             const weekAgo = new Date();
-
             weekAgo.setDate(today.getDate() - 7);
-
             matchDate = appDate >= weekAgo;
         }
-
         if (filters.dateRange === "month") {
-
             matchDate =
                 appDate.getMonth() === today.getMonth() &&
                 appDate.getFullYear() === today.getFullYear();
@@ -140,7 +123,12 @@ function ApplicationsPage() {
         matchDate
     );
 });
-
+const totalRecords = filteredApplications.length;
+const totalPages = Math.ceil(totalRecords / limit);
+const paginatedApplications = filteredApplications.slice(
+  (page - 1) * limit,
+  page * limit
+);
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
       <Sidebar sidebarOpen={sidebarOpen} />
@@ -158,12 +146,19 @@ function ApplicationsPage() {
           />
           <ApplicationStats />
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <ApplicationTable 
-              applications={filteredApplications}
+            <ApplicationTable
+              applications={paginatedApplications}
               onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}
-              />
+            />
+            <Pagination
+                  page={page}
+                  totalPages={totalPages}
+                  totalRecords={totalRecords}
+                  limit={limit}
+                  onPageChange={setPage}
+            />
               <ViewApplicationModal
                 open={viewOpen}
                 onClose={() => setViewOpen(false)}
@@ -175,11 +170,7 @@ function ApplicationsPage() {
                   application={selectedApplication}
                   onSave={handleSave}
                 />
-            <div className="p-3 border-t">
-             <ApplicationPagination />
-            </div>
           </div>
-
         </div>
       </div>
     </div>

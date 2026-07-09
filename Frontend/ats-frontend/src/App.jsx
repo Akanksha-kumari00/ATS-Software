@@ -10,6 +10,7 @@ import Application from "./Pages/Application";
 import Jobs from "./Pages/JobPositions/JobPositionsPage";
 import HospitalClients from "./Pages/HospitalClients/HospitalClientsPage";
 import ResumeBank from "./Pages/ResumeBank/ResumeBank";
+import SettingsPage from "./pages/settings/SettingsPage";
 function App() {
   return (
     <BrowserRouter>
@@ -24,7 +25,7 @@ function App() {
         <Route path="/jobs" element={<Jobs/>}/>
         <Route path="/clients" element={<HospitalClients/>}/>
         <Route path="/resumebank" element={<ResumeBank/>}/>
-      
+        <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     </BrowserRouter>
   );

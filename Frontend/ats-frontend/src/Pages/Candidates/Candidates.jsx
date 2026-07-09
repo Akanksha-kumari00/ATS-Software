@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
 import CandidateHeader from "../../components/candidates/CandidateHeader";
@@ -8,10 +9,12 @@ import CandidateDetails from "../../components/candidates/CandidateDetails";
 import { getCandidates, deleteCandidate } from "../../services/candidateService";
 import { exportCandidates } from "../../utils/exportCandidates";
 function Candidates() {
+  
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [candidates, setCandidates] = useState([]);
   const [search, setSearch] = useState("");
- const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const navigate = useNavigate();
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [filters, setFilters] = useState({
     speciality: "",
     experience: "",
@@ -80,8 +83,20 @@ function Candidates() {
     }))
   );
 };
+const handleEdit = (candidate) => {
+  navigate("/application", {
+    state: {
+      candidate,
+      isEdit: true,
+    },
+  });
+};
 const handleScheduleInterview = (candidate) => {
-  console.log("Schedule Interview", candidate);
+  navigate("/interview", {
+    state: {
+      candidate,
+    },
+  });
 };
 const handleSendMail = (candidate) => {
   console.log("Send Mail", candidate);
@@ -104,8 +119,8 @@ const handleDelete = async (id) => {
     console.log(err);
     alert("Delete failed.");
   }
-
 };
+
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
       <Sidebar sidebarOpen={sidebarOpen} />
@@ -133,6 +148,7 @@ const handleDelete = async (id) => {
               <CandidateTable
                 candidates={filteredCandidates}
                 setSelectedCandidate={setSelectedCandidate}
+                onEdit={handleEdit}
                 onDelete={handleDelete}
                 onScheduleInterview={handleScheduleInterview}
                 onSendMail={handleSendMail}
@@ -143,6 +159,7 @@ const handleDelete = async (id) => {
                   onClose={() => setSelectedCandidate(null)}
                 />
               )}
+              
             </div>
           </div>
         </div>
