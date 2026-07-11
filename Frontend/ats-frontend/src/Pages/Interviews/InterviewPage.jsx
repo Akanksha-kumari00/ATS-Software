@@ -54,7 +54,6 @@ const fetchData = useCallback(async () => {
       getInterviews(page, limit),
       getInterviewStats(),
     ]);
-
     setInterviews(interviewRes.data.interviews);
     setTotalPages(interviewRes.data.totalPages);
     setTotalRecords(interviewRes.data.totalRecords);

@@ -3,7 +3,9 @@ import {
   FaFileAlt,
   FaCalendarAlt,
   FaGift,
+  FaUserSlash,
   FaUserCheck
+  
 } from "react-icons/fa";
 
 function StatsCards({ stats }) {
@@ -22,21 +24,24 @@ function StatsCards({ stats }) {
       icon: <FaFileAlt />,
       bg: "bg-purple-500",
     },
-
     {
       title: "Interviews",
       value: stats?.interviewCandidates || 0,
       icon: <FaCalendarAlt />,
       bg: "bg-yellow-500",
     },
-
     {
       title: "Selected",
       value: stats?.selectedCandidates || 0,
       icon: <FaGift />,
       bg: "bg-teal-500",
     },
-
+    {
+      title: "Dropout",
+      value: stats?.dropoutCandidates || 0,
+      icon: <FaUserSlash />,
+      bg: "bg-orange-500",
+    },
     {
       title: "Rejected",
       value: stats?.rejectedCandidates || 0,
@@ -47,49 +52,28 @@ function StatsCards({ stats }) {
   ];
 
   return (
-
-    <div className="grid grid-cols-5 gap-2 mt-1">
-
+<div className="grid grid-cols-6 gap-2 mt-1">
       {
-
         cards.map((card) => (
-
           <div
-
             key={card.title}
-
             className="bg-white rounded-lg px-3 py-2 flex items-center gap-2 shadow-sm border border-gray-100 h-20"
-
           >
-
             <div
-
               className={`${card.bg} w-8 h-8 rounded-md flex items-center justify-center text-white text-xs shrink-0`}
-
             >
-
               {card.icon}
-
             </div>
-
             <div className="min-w-0">
 
               <p className="text-[11px] text-gray-500 font-medium truncate">
-
                 {card.title}
-
               </p>
-
               <h4 className="text-xl font-bold text-gray-800">
-
                 {card.value}
-
               </h4>
-
             </div>
-
           </div>
-
         ))
       }
     </div>

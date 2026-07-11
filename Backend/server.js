@@ -1,4 +1,4 @@
-
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const candidateRoutes = require("./routes/candidateRoutes");
@@ -7,7 +7,7 @@ const employeeRoutes = require("./routes/employeeRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
 const hospitalRoutes = require("./routes/hospitalRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
-
+const mailRoutes = require("./routes/mailRoutes");
 
 
 const app = express();
@@ -34,7 +34,7 @@ app.use("/api/applications",applicationRoutes);
 app.use("/api/jobs", require("./routes/jobRoutes"));
 app.use("/api/hospitals", hospitalRoutes);
 app.use("/api/resume", resumeRoutes);
-
+app.use("/api/mail", mailRoutes);
 // Server
 const PORT = 5000;
 app.listen(PORT, () => {

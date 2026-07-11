@@ -1,67 +1,123 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+ import axios from "axios";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
 import CandidateHeader from "../../components/candidates/CandidateHeader";
 import CandidateFilters from "../../components/candidates/CandidateFilters";
 import CandidateTable from "../../components/candidates/CandidateTable";
 import CandidateDetails from "../../components/candidates/CandidateDetails";
-import { getCandidates, deleteCandidate } from "../../services/candidateService";
+import BulkActionBar from "../../components/candidates/BulkActionBar";
+import BulkEmailModal from "../../components/candidates/BulkEmailModal";
+import { getCandidates, deleteCandidate, importCandidates } from "../../services/candidateService";
 import { exportCandidates } from "../../utils/exportCandidates";
 function Candidates() {
-  
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [candidates, setCandidates] = useState([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("")
   const navigate = useNavigate();
   const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const [filters, setFilters] = useState({
-    speciality: "",
-    experience: "",
-    location: [],
-    hiringStage: []
-  })
-  useEffect(() => {
-    const loadCandidates = async () => {
-      try {
-        const data = await getCandidates();
-        setCandidates(data);
-      }
-      catch (error) {
-        console.log(error);
-      }
-    };
-    loadCandidates();
-  }, []);
-  const filteredCandidates = candidates.filter((candidate) => {
-    const searchMatch =
-      candidate.candidate_name
-      ?.toLowerCase()
-      .includes(search.toLowerCase());
-    const specialityMatch =
-      !filters.speciality ||
-      candidate.specialization === filters.speciality;
-    const experienceMatch =
-      !filters.experience ||
-      candidate.experience === filters.experience;
-    const locationMatch =
-      filters.location.length === 0 ||
-      filters.location.includes(
-        candidate.hospital_location
-      );
-    const stageMatch =
-      filters.hiringStage.length === 0 ||
-      filters.hiringStage.includes(
-        candidate.status
-      );
-    return (
-      searchMatch &&
-      specialityMatch &&
-      experienceMatch &&
-      locationMatch &&
-      stageMatch
+  const [selectedCandidates, setSelectedCandidates] = useState([]);
+const [filters, setFilters] = useState({
+  speciality: [],
+  location: [],
+  hospital: [],
+  gender: "",
+  salaryMin: "",
+  salaryMax: "",
+  interviewStatus: [],
+});
+
+const [showBulkEmail, setShowBulkEmail] = useState(false);
+  const loadCandidates = async () => {
+  try {
+    const data = await getCandidates();
+    setCandidates(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+useEffect(() => {
+  loadCandidates();
+}, []);
+
+const sendBulkEmail = async (data) => {
+  try {
+    await axios.post(
+      "http://localhost:5000/api/mail/bulk",
+      data
     );
-  });
+
+    alert("Emails sent successfully.");
+
+    setShowBulkEmail(false);
+    setSelectedCandidates([]);
+  } catch (err) {
+    console.error(err);
+    alert("Unable to send emails.");
+  }
+};
+
+ const filteredCandidates = candidates.filter((candidate) => {
+
+  // Search
+  const searchMatch =
+    candidate.candidate_name
+      ?.toLowerCase()
+      .includes(search.toLowerCase()) ||
+    candidate.email
+      ?.toLowerCase()
+      .includes(search.toLowerCase()) ||
+    candidate.mobile
+      ?.includes(search);
+
+  // Speciality
+  const specialityMatch =
+  filters.speciality.length === 0 ||
+  filters.speciality.includes(candidate.specialization);
+
+  // Location
+  const locationMatch =
+  filters.location.length === 0 ||
+  filters.location.includes(candidate.hospital_location);
+
+  // Hospital
+  const hospitalMatch =
+  filters.hospital.length === 0 ||
+  filters.hospital.includes(candidate.hospital_name);
+
+  // Gender
+  const genderMatch =
+    !filters.gender ||
+    candidate.gender === filters.gender;
+
+  // Salary
+  const salary = Number(candidate.salary_expectation || 0);
+
+  const salaryMatch =
+    (!filters.salaryMin || salary >= Number(filters.salaryMin)) &&
+    (!filters.salaryMax || salary <= Number(filters.salaryMax));
+
+  // Interview Status
+ const interviewMatch =
+  filters.interviewStatus.length === 0 ||
+  filters.interviewStatus.includes(candidate.interview_status);
+
+  return (
+    searchMatch &&
+    specialityMatch &&
+    locationMatch &&
+    hospitalMatch &&
+    genderMatch &&
+    salaryMatch &&
+    interviewMatch
+  );
+});
+const selectedEmails = filteredCandidates
+  .filter((candidate) => selectedCandidates.includes(candidate.id))
+  .map((candidate) => candidate.email)
+  .filter(Boolean);
   const handleExport = () => {
   exportCandidates(
     filteredCandidates.map((c) => ({
@@ -83,6 +139,27 @@ function Candidates() {
     }))
   );
 };
+const handleImport = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await importCandidates(formData);
+    alert(
+      `Imported : ${res.data.imported}\nSkipped : ${res.data.skipped}`
+    );
+      loadCandidates();
+
+  } catch (err) {
+
+    console.log(err);
+
+    alert("Import Failed");
+
+  }
+
+};
 const handleEdit = (candidate) => {
   navigate("/application", {
     state: {
@@ -101,6 +178,31 @@ const handleScheduleInterview = (candidate) => {
 const handleSendMail = (candidate) => {
   console.log("Send Mail", candidate);
 };
+
+const handleSelectCandidate = (id) => {
+  setSelectedCandidates((prev) =>
+    prev.includes(id)
+      ? prev.filter((item) => item !== id)
+      : [...prev, id]
+  );
+};
+
+const handleSelectAll = () => {
+  if (selectedCandidates.length === filteredCandidates.length) {
+    setSelectedCandidates([]);
+  } else {
+    setSelectedCandidates(filteredCandidates.map((c) => c.id));
+  }
+};
+const handleBulkMail = () => {
+  if (selectedCandidates.length === 0) {
+    alert("Please select at least one candidate.");
+    return;
+  }
+
+  setShowBulkEmail(true);
+};
+
 const handleDelete = async (id) => {
 
   const confirmDelete = window.confirm(
@@ -121,50 +223,72 @@ const handleDelete = async (id) => {
   }
 };
 
-  return (
-    <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
-      <Sidebar sidebarOpen={sidebarOpen} />
-      <div className="flex-1 overflow-y-auto">
-        <Topbar
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
+return (
+  <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
+    <Sidebar sidebarOpen={sidebarOpen} />
+
+    <div className=" overflow-y-auto">
+
+      <Topbar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      />
+
+      <div className="p-2">
+
+        <CandidateHeader
+          search={search}
+          setSearch={setSearch}
+          onExport={handleExport}
+          onImport={handleImport}
+          onAdd={() => navigate("/application")}
         />
-        <div className="p-4">
-          <div className="grid grid-cols-12 gap-4">
-            {/* Filters */}
-            <div className="col-span-2">
-              <CandidateFilters
-                filters={filters}
-                setFilters={setFilters}
+
+        <CandidateFilters
+          filters={filters}
+          setFilters={setFilters}
+          candidates={candidates}
+        />
+          <BulkActionBar
+            selectedCount={selectedCandidates.length}
+            onSendMail={handleBulkMail}
+            onSchedule={() => console.log("Bulk Interview")}
+            onAssign={() => console.log("Assign Recruiter")}
+            onExport={handleExport}
+            onDelete={() => console.log("Bulk Delete")}
+            onClear={() => setSelectedCandidates([])}
+          />
+            <CandidateTable
+            candidates={filteredCandidates}
+            selectedCandidates={selectedCandidates}
+            onSelectCandidate={handleSelectCandidate}
+            onSelectAll={handleSelectAll}
+            setSelectedCandidate={setSelectedCandidate}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onScheduleInterview={handleScheduleInterview}
+            onSendMail={handleSendMail}
+            />
+            {selectedCandidate && (
+              <CandidateDetails
+                candidate={selectedCandidate}
+                onClose={() =>
+                  setSelectedCandidate(null)
+                }
               />
-            </div>
-            {/* Table */}
-            <div className="col-span-10">
-              <CandidateHeader
-                search={search}
-                setSearch={setSearch}
-                onExport={handleExport}
+            )}
+              <BulkEmailModal
+                open={showBulkEmail}
+                onClose={() => setShowBulkEmail(false)}
+                recipients={selectedEmails}
+                onSend={sendBulkEmail}
               />
-              <CandidateTable
-                candidates={filteredCandidates}
-                setSelectedCandidate={setSelectedCandidate}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onScheduleInterview={handleScheduleInterview}
-                onSendMail={handleSendMail}
-              />
-              {selectedCandidate && (
-                <CandidateDetails
-                  candidate={selectedCandidate}
-                  onClose={() => setSelectedCandidate(null)}
-                />
-              )}
-              
-            </div>
-          </div>
-        </div>
+
       </div>
+
     </div>
-  );
+
+  </div>
+);
 }
 export default Candidates;

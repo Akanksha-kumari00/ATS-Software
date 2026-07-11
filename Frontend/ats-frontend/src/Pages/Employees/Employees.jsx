@@ -9,22 +9,18 @@ import axios from "axios";
 
 const API = "http://localhost:5000/api/employees";
 export default function EmployeePage() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [employees, setEmployees] = useState([]);
-  const [search, setSearch] = useState("");
+const [sidebarOpen, setSidebarOpen] = useState(true);
+const [employees, setEmployees] = useState([]);
+const [search, setSearch] = useState("");
 const [page, setPage] = useState(1);
 const [limit] = useState(10);
-
 const [totalPages, setTotalPages] = useState(1);
 const [totalRecords, setTotalRecords] = useState(0);
-
-
 const fetchEmployees = useCallback(async () => {
   try {
     const res = await axios.get(
       `${API}?page=${page}&limit=${limit}`
     );
-
     setEmployees(res.data.employees);
     setTotalPages(res.data.totalPages);
     setTotalRecords(res.data.totalRecords);
@@ -43,7 +39,6 @@ useEffect(() => {
       emp.job_profile?.toLowerCase().includes(search.toLowerCase())
     );
   });
-
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
       <Sidebar sidebarOpen={sidebarOpen} />

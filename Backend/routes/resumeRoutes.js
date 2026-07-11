@@ -4,25 +4,6 @@ const db = require("../config/db");
 const fs = require("fs");
 const path = require("path");
 
-
-// Get All Resumes
-/*router.get("/", async (req, res) => {
-  try {
-    const [rows] = await db.query(`
-      SELECT *
-      FROM resume_bank
-      ORDER BY uploaded_date DESC
-    `);
-    res.json(rows);
-
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: err.message,
-    });
-
-  }
-});*/
 router.get("/", async (req, res) => {
   try {
 

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 function LoginForm() {
   const navigate = useNavigate();
   const [role, setRole] = useState("admin");

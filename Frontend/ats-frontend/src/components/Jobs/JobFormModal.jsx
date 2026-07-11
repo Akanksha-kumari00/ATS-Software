@@ -150,11 +150,12 @@ export default function JobFormModal({
             
             <option value="">Select Hospital</option>
 
-            {hospitals.map((h) => (
+           {Array.isArray(hospitals) &&
+            hospitals.map((h) => (
               <option key={h.id} value={h.id}>
                 {h.hospital_name}
               </option>
-            ))}
+          ))}
           </select>
           {errors.hospital_id && (
               <p className="text-red-500 text-sm">

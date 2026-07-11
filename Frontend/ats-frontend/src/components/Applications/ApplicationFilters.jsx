@@ -89,6 +89,7 @@ export default function ApplicationFilters({
             <option value="Interview">Interview</option>
             <option value="Selected">Selected</option>
             <option value="Rejected">Rejected</option>
+            <option value="Dropout">Dropout</option>
           </select>
         </div>
 

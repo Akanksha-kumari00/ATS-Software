@@ -1,5 +1,12 @@
 import axios from "axios";
 const API = "http://localhost:5000/api/candidates";
+export const importCandidates = async (formData) => {
+  return await axios.post(`${API}/import`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
 // Get all candidates
 export const getCandidates = async () => {
   try {

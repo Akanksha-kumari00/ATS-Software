@@ -25,31 +25,31 @@ function RecruitmentPipeline() {
           fetchData();
         }, [period]);
   const cardColors = [
-    "bg-blue-50 text-blue-600",
-    "bg-cyan-50 text-cyan-600",
-    "bg-purple-50 text-purple-600",
-    "bg-orange-50 text-orange-600",
-    "bg-green-50 text-green-600",
-    "bg-red-50 text-red-600"
+    "bg-blue-50 text-blue-700",
+    "bg-cyan-50 text-cyan-700",
+    "bg-purple-50 text-purple-700",
+    "bg-orange-50 text-orange-700",
+    "bg-green-50 text-green-700",
+    "bg-red-50 text-red-700"
   ];
   const barColors = [
     "bg-blue-500",
     "bg-cyan-500",
-    "bg-purple-400",
-    "bg-orange-400",
-    "bg-green-400",
-    "bg-red-400"
+    "bg-purple-500",
+    "bg-orange-500",
+    "bg-green-500",
+    "bg-red-500"
   ];
   const icons = [
-    <UserPlus size={10} />,
-    <FileText size={10} />,
-    <Star size={10} />,
-    <CalendarDays size={10} />,
-    <CheckCircle size={10} />,
-    <XCircle size={10} />
+    <UserPlus size={12} />,
+    <FileText size={12} />,
+    <Star size={12} />,
+    <CalendarDays size={12} />,
+    <CheckCircle size={12} />,
+    <XCircle size={12} />
   ];
   return (
-    <div className="bg-white rounded-xl p-2 shadow-sm">
+    <div className="bg-white rounded-xl p-3 shadow-sm">
       {/* Header */}
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-lg font-semibold">
@@ -86,12 +86,12 @@ function RecruitmentPipeline() {
                 className={`
                 w-full
                 rounded-lg
-                p-2
+                p-3
                 text-center
                 ${cardColors[index]}
                 `}
               >
-                <div className="flex justify-center mb-1">
+                <div className="p-1 flex justify-center mb-1">
                   {icons[index]}
                 </div>
                 <p className="font-medium text-[11px]">
@@ -117,7 +117,7 @@ function RecruitmentPipeline() {
         }
       </div>
       {/* Progress Bar */}
-      <div className="flex h-1.5 rounded-full overflow-hidden mt-2">
+      <div className="flex h-2 rounded-full overflow-hidden mt-3">
         {
           data.map((item,index)=>(
             <div

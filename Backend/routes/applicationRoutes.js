@@ -37,7 +37,7 @@ router.get("/stats", async (req, res) => {
     COUNT(*) AS totalApplications,
 COUNT(CASE WHEN TRIM(status) = 'CV Shared' THEN 1 END) AS cvShared,
 COUNT(CASE WHEN TRIM(status) = 'Shortlisted' THEN 1 END) AS shortlisted,
-COUNT(CASE WHEN TRIM(status) = 'Interview Done' THEN 1 END) AS interview,
+COUNT(CASE WHEN TRIM(status) = 'Interview' THEN 1 END) AS interview,
 COUNT(CASE WHEN TRIM(status) = 'Selected' THEN 1 END) AS selected,
 COUNT(CASE WHEN TRIM(status) = 'Rejected' THEN 1 END) AS rejected
 FROM candidates;

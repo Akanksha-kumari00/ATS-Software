@@ -4,21 +4,37 @@ import {
   FileText,
 } from "lucide-react";
 function CandidateTable({
- candidates = [],
+  candidates = [],
+  selectedCandidates = [],
+  onSelectCandidate,
+  onSelectAll,
   setSelectedCandidate,
   onEdit,
   onDelete,
   onScheduleInterview,
   onSendMail,
-}) {
+})
+ {
   return (
    <div className="bg-white rounded-xl shadow p-3 overflow-visible">
   <div className="relative overflow-visible">
     <div className="overflow-x-auto">
         <table className="min-w-[1250px] w-full text-sm">
           {/* HEADER */}
-          <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
+          
+          <thead className="bg-gray-50 text-gray-600 sticky top-0 z-10 text-xs uppercase">
+            
             <tr>
+              <th className="w-12 p-3">
+              <input
+              type="checkbox"
+              checked={
+              candidates.length > 0 &&
+              selectedCandidates.length === candidates.length
+              }
+              onChange={onSelectAll}
+              />
+              </th>
               <th className="p-2 text-left">Candidate</th>
               <th className="p-2 text-left">Profile</th>
               <th className="p-2 text-left">Hospital</th>
@@ -34,18 +50,29 @@ function CandidateTable({
           {/* BODY */}
           <tbody className="divide-y">
             {candidates.map((c) => (
+              
               <tr
                 key={c.id}
                 onClick={() => setSelectedCandidate(c)}
-                className="hover:bg-blue-50 cursor-pointer"
+               className="hover:bg-blue-50 transition-all duration-150 cursor-pointer"
               >
+                <td
+                  className="p-3"
+                  onClick={(e)=>e.stopPropagation()}
+                  >
+                  <input
+                  type="checkbox"
+                  checked={selectedCandidates.includes(c.id)}
+                  onChange={()=>onSelectCandidate(c.id)}
+                  />
+                  </td>
                 {/* Candidate */}
                 <td className="p-2 relative">
                   <div>
-                    <p className="font-semibold">
+                    <p className="font-semibold text-gray-800">
                       {c.candidate_name}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 truncate">
                       {c.email}
                     </p>
                     <p className="text-xs text-gray-500">
@@ -71,7 +98,7 @@ function CandidateTable({
                 <td className="p-2 text-xs">
                   <p className="font-medium">
                     {c.interview_status}
-                  </p>
+                    </p>
 
                   <p className="text-gray-500">
                     {c.interview_date
@@ -86,7 +113,9 @@ function CandidateTable({
                 </td>
                 {/* Salary */}
                 <td className=" font-medium">
-                  ₹{c.salary_expectation}
+                  <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
+                    ₹ {c.salary_expectation}
+                    </span>
                 </td>
                 {/* Experience */}
                 <td >

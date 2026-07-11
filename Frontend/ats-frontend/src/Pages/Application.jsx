@@ -212,6 +212,7 @@ const handleFileChange = (e) => {
                 <option>Shortlisted</option>
                 <option>Interview</option>
                 <option>Selected</option>
+                <option value="Dropout">Dropout</option>
                 <option>Rejected</option>
               </select>
              <select

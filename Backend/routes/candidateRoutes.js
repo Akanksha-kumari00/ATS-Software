@@ -1,8 +1,106 @@
 console.log("Candidate Routes Loaded");
+const XLSX = require("xlsx");
+const fs = require("fs");
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 const multer = require("multer");
+exports.importCandidates = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Please upload an Excel file.",
+      });
+    }
+
+    const workbook = XLSX.readFile(req.file.path);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet);
+    let imported = 0;
+    let skipped = 0;
+    for (const row of rows) {
+      // Mobile is mandatory
+      if (!row.Mobile) {
+        skipped++;
+        continue;
+      }
+      // Duplicate Mobile Check
+      const [exist] = await db.query(
+        "SELECT id FROM candidates WHERE mobile=?",
+        [row.Mobile]
+      );
+      if (exist.length > 0) {
+        skipped++;
+        continue;
+      }
+      await db.query(
+        `
+        INSERT INTO candidates
+        (
+          recruiter_name,
+          candidate_name,
+          gender,
+          education,
+          specialization,
+          mobile,
+          email,
+          hospital_name,
+          hospital_location,
+          cv_forward_date,
+          salary_expectation,
+          status,
+          interview_status,
+          remarks,
+          interview_date,
+          interview_time,
+          experience
+        )
+        VALUES
+        (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      `,
+        [
+          row.RecruiterName || "",
+          row.CandidateName || "",
+          row.Gender || null,
+          row.Education || "",
+          row.Specialization || "",
+          row.Mobile,
+          row.Email || "",
+          row.HospitalName || "",
+          row.HospitalLocation || "",
+          row.CVForwardDate || null,
+          row.SalaryExpectation || "",
+          row.Status || "New",
+          row.InterviewStatus || "Pending",
+          row.Remarks || "",
+          row.InterviewDate || null,
+          row.InterviewTime || null,
+          row.Experience || "",
+        ]
+      );
+
+      imported++;
+    }
+
+    // Delete uploaded excel after import
+    fs.unlinkSync(req.file.path);
+    res.json({
+      success: true,
+      imported,
+      skipped,
+      total: rows.length,
+    });
+
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
 // =======================
 // Multer Configuration
 // ====================
@@ -32,7 +130,12 @@ router.get("/", async (req, res) => {
     });
   }
 });
-
+// =======================
+// Import Candidates
+// =======================
+router.post("/import", upload.single("file"), async (req, res) => {
+  return exports.importCandidates(req, res);
+});
 // =======================
 // Add Candidate
 // =======================
@@ -312,9 +415,11 @@ router.get("/:id", async (req, res) => {
 // =======================
 router.put("/:id", upload.single("cv"), async (req, res) => {
   console.log("BODY:", req.body);
-console.log("FILE:", req.file);
+  console.log("FILE:", req.file);
+
   try {
     const { id } = req.params;
+
     const {
       recruiter_name,
       candidate_name,
@@ -327,13 +432,35 @@ console.log("FILE:", req.file);
       hospital_location,
       cv_forward_date,
       salary_expectation,
-       experience,
+      experience,
       status,
       interview_status,
       remarks,
       interview_date,
-      interview_time
+      interview_time,
     } = req.body;
+
+    // Existing CV fetch karo
+    const [rows] = await db.query(
+      "SELECT cv_name, cv_path FROM candidates WHERE id=?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        message: "Candidate not found",
+      });
+    }
+
+    let cv_name = rows[0].cv_name;
+    let cv_path = rows[0].cv_path;
+
+  
+    if (req.file) {
+      cv_name = req.file.originalname;
+      cv_path = req.file.path.replace(/\\/g, "/");
+    }
+
     await db.query(
       `
       UPDATE candidates
@@ -349,12 +476,14 @@ console.log("FILE:", req.file);
       hospital_location=?,
       cv_forward_date=?,
       salary_expectation=?,
-       experience=?,
+      experience=?,
       status=?,
       interview_status=?,
       remarks=?,
       interview_date=?,
-      interview_time=?
+      interview_time=?,
+      cv_name=?,
+      cv_path=?
       WHERE id=?
       `,
       [
@@ -375,24 +504,73 @@ console.log("FILE:", req.file);
         remarks,
         interview_date,
         interview_time,
-        id
+        cv_name,
+        cv_path,
+        id,
       ]
     );
+// =======================
+// Resume Bank Sync
+// =======================
+if (req.file) {
+  const [resumeRows] = await db.query(
+    "SELECT id FROM resume_bank WHERE mobile = ?",
+    [mobile]
+  );
+
+  if (resumeRows.length > 0) {
+    await db.query(
+      `
+      UPDATE resume_bank
+      SET
+        candidate_name = ?,
+        specialization = ?,
+        resume_file = ?,
+        uploaded_date = NOW()
+      WHERE mobile = ?
+      `,
+      [
+        candidate_name,
+        specialization,
+        cv_path,
+        mobile,
+      ]
+    );
+
+    console.log("Resume Bank Updated");
+  } else {
+    await db.query(
+      `
+      INSERT INTO resume_bank
+      (
+        candidate_name,
+        mobile,
+        specialization,
+        resume_file
+      )
+      VALUES (?,?,?,?)
+      `,
+      [
+        candidate_name,
+        mobile,
+        specialization,
+        cv_path,
+      ]
+    );
+
+    console.log("Resume Bank Inserted");
+  }
+}
     res.json({
-      message: "Updated Successfully"
+      message: "Updated Successfully",
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({
+      message: err.message,
     });
   }
-  catch (err) {
-  console.log("========== ERROR ==========");
-  console.log(err);
-  console.log("SQL:", err.sqlMessage);
-  console.log("CODE:", err.code);
-
-  res.status(500).json({
-    message: err.message,
-    sql: err.sqlMessage,
-  });
-}
 });
 // =======================
 // Delete Candidate

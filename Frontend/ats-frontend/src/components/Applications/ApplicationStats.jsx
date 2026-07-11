@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import { getApplicationStats }from "../../services/applicationService";
 import {
   FaFileAlt,
@@ -15,7 +14,6 @@ export default function ApplicationStats() {
   useEffect(() => {
     loadStats();
   }, []);
-
   const loadStats = async () => {
   try {
     const res = await getApplicationStats();

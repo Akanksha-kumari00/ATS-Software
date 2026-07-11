@@ -88,22 +88,38 @@ exports.getRecruitmentPipeline = async (req, res) => {
     });
   }
 };
-exports.getHospitalWiseHiring = async (req, res) => {
+// Dashboard Summary Cards
+exports.getHiringSummary = async (req, res) => {
   try {
-    const [rows] = await db.query(`
-      SELECT
-      hospital_name,
-      COUNT(*) AS total
-      FROM candidates
-      GROUP BY hospital_name
-      ORDER BY total DESC
+
+    const [[hospital]] = await db.query(`
+    SELECT COUNT(*) AS totalHospitals
+    FROM clients_hospitals
+    WHERE status = 'Active'
+   `);
+
+    const [[position]] = await db.query(`
+      SELECT COUNT(*) AS totalPositions
+      FROM job_positions
     `);
-    res.json(rows);
-  }
-  catch (error) {
-    console.log(error);
+
+    const [[hiring]] = await db.query(`
+      SELECT COUNT(*) AS totalHiring
+      FROM candidates
+      WHERE status='Selected'
+    `);
+
+    res.json({
+      totalHospitals: hospital.totalHospitals,
+      totalPositions: position.totalPositions,
+      totalHiring: hiring.totalHiring,
+    });
+
+  } catch (err) {
+    console.error(err);
     res.status(500).json({
-      message: "Server Error"
+      message: err.message,
+      sql: err.sqlMessage,
     });
   }
 };

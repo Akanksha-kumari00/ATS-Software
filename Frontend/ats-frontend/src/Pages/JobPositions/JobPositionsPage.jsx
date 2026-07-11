@@ -16,8 +16,7 @@ export default function JobPositionsPage() {
   const [editOpen, setEditOpen] = useState(false);
   const [hospitals, setHospitals] = useState([]);
   const [addOpen, setAddOpen] = useState(false);
-
-  const [jobs, setJobs] = useState([]);
+const [jobs, setJobs] = useState([]);
 const [page, setPage] = useState(1);
 const [limit] = useState(10);
 const [totalPages, setTotalPages] = useState(1);
@@ -67,12 +66,12 @@ const fetchStats = useCallback(async () => {
     console.error("Stats Error:", err);
   }
 }, []);
-
 // ================= Fetch Hospitals =================
 const fetchHospitals = async () => {
   try {
     const res = await getHospitals();
-    setHospitals(res.data);
+    
+    setHospitals(res.data.hospitals); 
   } catch (err) {
     console.log(err);
   }
@@ -115,7 +114,6 @@ const handleDelete = async (id) => {
   );
 
   if (!ok) return;
-
   try {
     await deleteJob(id);
     fetchJobs();

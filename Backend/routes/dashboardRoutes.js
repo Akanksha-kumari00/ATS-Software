@@ -15,6 +15,7 @@ router.get("/stats", async (req, res) => {
         SUM(status='New') AS newCandidates,
         SUM(status='Interview') AS interviewCandidates,
         SUM(status='Selected') AS selectedCandidates,
+        SUM(status='Dropout') AS dropoutCandidates,
         SUM(status='Rejected') AS rejectedCandidates
       FROM candidates
     `;
@@ -30,9 +31,7 @@ router.get("/stats", async (req, res) => {
 });
 
 router.get("/pipeline", getRecruitmentPipeline);
-
-router.get("/hospital-wise",dashboardController.getHospitalWiseHiring);
+router.get("/hiring-summary", dashboardController.getHiringSummary);
 router.get("/recent-applications",dashboardController.getRecentApplications);
 router.get("/upcoming-interviews",dashboardController.getUpcomingInterviews);
-
 module.exports = router;
