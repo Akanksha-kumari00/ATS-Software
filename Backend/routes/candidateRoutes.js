@@ -571,6 +571,7 @@ if (req.file) {
       message: err.message,
     });
   }
+  
 });
 // =======================
 // Delete Candidate

@@ -13,7 +13,7 @@ exports.sendBulkMail = async (req, res) => {
       });
     }
    
-    const info = await transporter.sendMail({
+  const info = await transporter.sendMail({
   from: `"DCS Healthcare Services" <${process.env.EMAIL_USER}>`,
   to: recipients, 
   subject,
