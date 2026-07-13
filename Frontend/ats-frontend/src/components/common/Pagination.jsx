@@ -58,7 +58,7 @@ export default function Pagination({
       </p>
 
       {/* Right */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-2">
         {/* Previous */}
         <button
           onClick={() => onPageChange(page - 1)}

@@ -22,7 +22,7 @@ export default function ApplicationFilters({
       <div className="flex flex-wrap items-center gap-4">
 
         {/* Search */}
-        <div className="flex items-center border rounded-xl px-2 h-10 flex-1 min-w-[300px]">
+        <div className="flex items-center border rounded-xl px-2 h-10 flex-1 min-w-[220px] w-full sm:w-auto">
           <FaSearch className="text-gray-400 mr-3" />
           <input
             type="text"

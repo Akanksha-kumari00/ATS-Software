@@ -92,9 +92,9 @@ export default function ScheduleInterviewModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
 
-      <div className="bg-white w-[650px] rounded-3xl shadow-2xl">
+      <div className="bg-white w-full max-w-[650px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl">
 
         {/* Header */}
 
@@ -205,7 +205,7 @@ export default function ScheduleInterviewModal({
 
           {/* Date Time */}
 
-          <div className="grid grid-cols-2 gap-5 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-6">
 
             <div>
 

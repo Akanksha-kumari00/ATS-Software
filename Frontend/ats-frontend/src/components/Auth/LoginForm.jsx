@@ -1,212 +1,224 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import logo from "../../assets/logo.jpeg";
+
 function LoginForm() {
   const navigate = useNavigate();
-  const [role, setRole] = useState("admin");
+  const [role, setRole] = useState("Admin");
   const [isLogin, setIsLogin] = useState(true);
   const [showForgot, setShowForgot] = useState(false);
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const name = e.target.name?.value;
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+  const roles = ["Admin", "Recruiter", "BDE"];
+const handleSubmit = (e) => {
+  e.preventDefault();
 
-    // CREATE ACCOUNT
-    if (!isLogin) {
-      const account = {
-        name,
-        email,
-        password,
-        role,
-      };
-      localStorage.setItem(
-        "account",
-        JSON.stringify(account)
-      );
-      alert("Account Created Successfully");
-      setIsLogin(true);
-      return;
-    }
+  const name = e.target.name?.value;
+  const email = e.target.email.value;
+  const password = e.target.password.value;
 
-    // LOGIN
-    const savedAccount = JSON.parse(
-      localStorage.getItem("account")
+  if (!isLogin) {
+    const accounts =
+      JSON.parse(localStorage.getItem("accounts")) || [];
+
+    const existingUser = accounts.find(
+      (acc) => acc.email === email
     );
-    if (!savedAccount) {
-      alert("Please create account first");
+
+    if (existingUser) {
+      alert("Account already exists");
       return;
     }
-    if (
-      savedAccount.email === email &&
-      savedAccount.password === password
-    ) {
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          email,
-          role: savedAccount.role,
-        })
-      );
-      navigate("/dashboard");
-    } else {
-      alert("Invalid Email or Password");
-    }
-  };
-  // FORGOT PASSWORD
+
+    const newUser = {
+      name,
+      email,
+      password,
+      role,
+    };
+
+    accounts.push(newUser);
+
+    localStorage.setItem(
+      "accounts",
+      JSON.stringify(accounts)
+    );
+
+    alert("Account Created Successfully");
+    setIsLogin(true);
+    return;
+  }
+
+  const accounts =
+    JSON.parse(localStorage.getItem("accounts")) || [];
+
+  const user = accounts.find(
+    (acc) =>
+      acc.email === email &&
+      acc.password === password &&
+      acc.role === role
+  );
+
+  if (user) {
+  localStorage.setItem(
+    "user",
+    JSON.stringify(user)
+  );
+
+  navigate("/dashboard");
+} else {
+  alert("Invalid Email, Password or Role");
+}
+
+   
+}
+  // FORGOT PASSWORD SCREEN
   if (showForgot) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-6">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <div className="w-7 h-7 rounded-full bg-cyan-400"></div>
-            <h1 className="text-2xl font-bold">
-              DCS
-            </h1>
-          </div>
-          <h2 className="text-center text-2xl font-semibold mb-8">
-            FORGOT PASSWORD
-          </h2>
-
-          <input
-            type="email"
-            placeholder="Enter Email"
-            className="w-full border rounded-lg p-3 mb-6"
+      <div className="p-10 flex flex-col justify-center h-full">
+        <div className="text-center mb-6">
+          <img
+            src={logo}
+            alt="Logo"
+            className="w-24 h-24 rounded-full object-cover mx-auto"
           />
-          <button
-            className="w-full bg-cyan-500 text-white py-3 rounded-lg hover:bg-cyan-600"
-          >
-            Send Reset Link
-          </button>
-          <button
-            onClick={() => setShowForgot(false)}
-            className="w-full mt-5 text-cyan-600"
-          >
-            Back To Login
-          </button>
         </div>
+
+        <h2 className="text-3xl font-bold text-center mb-8">
+          Forgot Password
+        </h2>
+
+        <input
+          type="email"
+          placeholder="Enter Email"
+          className="px-5 py-4 border border-gray-300 rounded-full mb-5 outline-none focus:border-[#13578f]"
+        />
+
+        <button className="bg-[#13578f] text-white py-4 rounded-full hover:bg-[#0d4874] transition">
+          Send Reset Link
+        </button>
+
+        <button
+          onClick={() => setShowForgot(false)}
+          className="mt-5 text-[#13578f] font-medium"
+        >
+          Back To Login
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-6 overflow-y-auto">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-5">
-        <h2 className="text-center text-2xl font-semibold mb-6">
-          {isLogin ? "SIGN IN" : "CREATE ACCOUNT"}
-        </h2>
-        <form onSubmit={handleSubmit}>
-          {!isLogin && (
-            <div className="mb-4">
-              <label className="block mb-2">
-                Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                placeholder="Enter Name"
-                className="w-full border rounded-lg p-2"
-                required
-              />
-            </div>
-          )}
-          <div className="mb-4">
-            <label className="block mb-2">
-              Login As
-            </label>
-            <select
-              value={role}
-              onChange={(e) =>
-                setRole(e.target.value)
-              }
-              className="w-full border rounded-lg p-3"
-            >
+   <div className="p-6 lg:p-5 flex flex-col justify-center min-h-full overflow-y-auto">
+      {/* Logo */}
+      <div className="w-28 h-28 rounded-full bg-white overflow-hidden mx-auto p-2 flex items-center justify-center">
+  <img
+    src={logo}
+    alt="DCS Logo"
+    className="w-full h-full object-contain"
+  />
+</div>
 
-              <option value="admin">
-                Admin
-              </option>
-              <option value="recruiter">
-                Recruiter
-              </option>
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              placeholder="Enter Email"
-              className="w-full border rounded-lg p-3"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2">
-              Passwor
-            </label>
-            <input
-              type="password"
-              name="password"
-              placeholder="Enter Password"
-              className="w-full border rounded-lg p-3"
-              required
-            />
-          </div>
-          {isLogin && (
-            <div className="text-right mb-5">
-              <button
-                type="button"
-                onClick={() =>
-                  setShowForgot(true)
-                }
-                className="text-cyan-600 text-sm"
-              >
-                Forgot Password?
-              </button>
-            </div>
-          )}
+      {/* Heading */}
+      <h1 className="text-4xl font-bold text-center mb-3">
+        {isLogin ? "Welcome Back!" : "Create Account"}
+      </h1>
+
+      <p className="text-gray-500 text-center mb-8">
+        {isLogin
+          ? "Login to DCS Healthcare ATS Portal and manage candidates efficiently."
+          : "Create your account to access the DCS Healthcare ATS Portal."}
+      </p>
+
+      {/* Roles */}
+      <div className="flex justify-center gap-3 mb-8 flex-wrap">
+        {roles.map((item) => (
           <button
-            type="submit"
-            className="w-full bg-cyan-500 text-white py-3 rounded-lg hover:bg-cyan-600"
+            key={item}
+            type="button"
+            onClick={() => setRole(item)}
+            className={`px-6 py-3 rounded-full transition ${
+              role === item
+                ? "bg-[#13578f] text-white"
+                : "bg-gray-200 hover:-translate-y-1"
+            }`}
           >
-
-            {isLogin
-              ? "Login"
-              : "Create Account"}
+            {item}
           </button>
-        </form>
-        <div className="text-center mt-6">
-          {isLogin ? (
-            <p>
-              Don't have an account?{" "}
-              <button
-                onClick={() =>
-                  setIsLogin(false)
-                }
-                className="text-cyan-600 font-semibold"
-              >
-                Create Account
-              </button>
-            </p>
-          ) : (
-            <p>
-              Already have an account?{" "}
-              <button
-                onClick={() =>
-                  setIsLogin(true)
-                }
-                className="text-cyan-600 font-semibold"
-              >
-                Sign In
-              </button>
-            </p>
-          )}
-
-        </div>
-
+        ))}
       </div>
 
+      {/* Form */}
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-5"
+      >
+        {!isLogin && (
+          <input
+            type="text"
+            name="name"
+            placeholder="Enter Name"
+            className="px-5 py-4 border border-gray-300 rounded-full outline-none focus:border-[#13578f]"
+            required
+          />
+        )}
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Enter Email"
+          className="px-5 py-4 border border-gray-300 rounded-full outline-none focus:border-[#13578f]"
+          required
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Enter Password"
+          className="px-5 py-4 border border-gray-300 rounded-full outline-none focus:border-[#13578f]"
+          required
+        />
+
+        {isLogin && (
+          <button
+            type="button"
+            onClick={() => setShowForgot(true)}
+            className="text-right text-[#13578f]"
+          >
+            Forgot Password?
+          </button>
+        )}
+
+        <button
+          type="submit"
+          className="bg-[#13578f] text-white py-4 rounded-full text-lg hover:bg-[#0d4874] transition"
+        >
+          {isLogin ? "Login" : "Create Account"}
+        </button>
+      </form>
+
+      {/* Toggle Login/Create Account */}
+      <div className="text-center mt-6">
+        {isLogin ? (
+          <p className="text-gray-600">
+            Don't have an account?{" "}
+            <button
+              onClick={() => setIsLogin(false)}
+              className="text-[#13578f] font-semibold"
+            >
+              Create Account
+            </button>
+          </p>
+        ) : (
+          <p className="text-gray-600">
+            Already have an account?{" "}
+            <button
+              onClick={() => setIsLogin(true)}
+              className="text-[#13578f] font-semibold"
+            >
+              Sign In
+            </button>
+          </p>
+        )}
+      </div>
     </div>
   );
 }

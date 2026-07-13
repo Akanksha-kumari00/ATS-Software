@@ -33,7 +33,7 @@ function HospitalWiseHiring() {
     Hiring Summary
   </h5>
 
-  <div className="grid grid-cols-3 gap-2">
+  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
 
     {/* Hospital */}
     <div className="rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 text-white p-3 h-30 flex flex-col justify-between">

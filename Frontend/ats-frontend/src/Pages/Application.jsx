@@ -110,7 +110,7 @@ const handleFileChange = (e) => {
           </h2>
               <form
               onSubmit={handleSubmit}
-              className="grid grid-cols-2 gap-4"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             >
               <input
                 required

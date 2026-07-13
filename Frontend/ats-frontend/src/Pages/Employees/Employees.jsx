@@ -9,7 +9,7 @@ import axios from "axios";
 
 const API = "http://localhost:5000/api/employees";
 export default function EmployeePage() {
-const [sidebarOpen, setSidebarOpen] = useState(true);
+const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 768);
 const [employees, setEmployees] = useState([]);
 const [search, setSearch] = useState("");
 const [page, setPage] = useState(1);
@@ -41,7 +41,7 @@ useEffect(() => {
   });
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
-      <Sidebar sidebarOpen={sidebarOpen} />
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="flex-1 overflow-y-auto">
         <Topbar
           sidebarOpen={sidebarOpen}

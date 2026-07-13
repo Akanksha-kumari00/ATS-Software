@@ -13,7 +13,7 @@ function Dashboard() {
 
   const [stats, setStats] = useState(null);
 
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 768);
 
   useEffect(() => {
 
@@ -43,7 +43,7 @@ function Dashboard() {
 
     <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
 
-      <Sidebar sidebarOpen={sidebarOpen} />
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       <div className="flex-1 overflow-y-auto">
 
@@ -54,10 +54,11 @@ function Dashboard() {
           setSidebarOpen={setSidebarOpen}
 
         />
+          <div className="p-2 mt=3">
+                <StatsCards stats={stats} />
 
-        <StatsCards stats={stats} />
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-2">
+          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
 
           <div className="lg:col-span-2">
 
@@ -67,9 +68,7 @@ function Dashboard() {
 
           <div
 
-            className="lg:col-span-1"
-
-            style={{ minWidth: "380px" }}
+            className="lg:col-span-1 min-w-0"
 
           >
 
@@ -79,7 +78,7 @@ function Dashboard() {
 
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-4">
 
           <RecentApplications />
 

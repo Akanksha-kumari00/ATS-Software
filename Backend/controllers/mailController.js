@@ -14,7 +14,7 @@ exports.sendBulkMail = async (req, res) => {
     }
    
   const info = await transporter.sendMail({
-  from: `"DCS Healthcare Services" <${process.env.EMAIL_USER}>`,
+  from: `"DCS Healthcare Services" <${process.env.SMTP_USER}>`,
   to: recipients, 
   subject,
   text: message,

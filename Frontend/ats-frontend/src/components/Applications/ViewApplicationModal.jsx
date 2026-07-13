@@ -6,8 +6,8 @@ application
 if (!open || !application)
 return null;
     return (
-        <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50">
-            <div className="bg-white w-[500px] rounded-xl p-6">
+        <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50 p-4">
+            <div className="bg-white w-full max-w-[500px] max-h-[90vh] overflow-y-auto rounded-xl p-6">
                     <div className="flex justify-between mb-5">
                         <h2 className="text-xl font-bold">
                             Application Details

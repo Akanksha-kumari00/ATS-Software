@@ -12,7 +12,7 @@ import BulkEmailModal from "../../components/candidates/BulkEmailModal";
 import { getCandidates, deleteCandidate, importCandidates } from "../../services/candidateService";
 import { exportCandidates } from "../../utils/exportCandidates";
 function Candidates() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 768);
   const [candidates, setCandidates] = useState([]);
   const [search, setSearch] = useState("")
   const navigate = useNavigate();
@@ -225,9 +225,9 @@ const handleDelete = async (id) => {
 
 return (
   <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
-    <Sidebar sidebarOpen={sidebarOpen} />
+    <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-    <div className=" overflow-y-auto">
+    <div className=" flex-1 overflow-y-auto">
 
       <Topbar
         sidebarOpen={sidebarOpen}

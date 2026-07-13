@@ -8,7 +8,7 @@ import HospitalViewModal from "../../components/hospitals/HospitalViewModal";
 import HospitalTable from "../../components/hospitals/HospitalTable";
 import hospitalService from "../../services/hospitalService";
 export default function HospitalClients() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 768);
   const [stats, setStats] = useState({});
   const [openModal, setOpenModal] = useState(false);
   const [editData, setEditData] = useState(null);
@@ -124,7 +124,7 @@ const [viewHospital, setViewHospital] = useState(null);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
-          <Sidebar sidebarOpen={sidebarOpen} />
+          <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
           <div className="flex-1 overflow-y-auto">
             <Topbar
               sidebarOpen={sidebarOpen}

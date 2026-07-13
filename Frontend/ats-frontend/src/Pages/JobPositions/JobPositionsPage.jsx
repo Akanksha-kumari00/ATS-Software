@@ -10,7 +10,7 @@ import ViewJobModal from "../../components/Jobs/ViewJobModal";
 import { getJobs, getJobStats , deleteJob, updateJob,createJob,getHospitals,} from "../../services/jobService";
 import JobFormModal from "../../components/Jobs/JobFormModal";
 export default function JobPositionsPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 768);
   const [selectedJob, setSelectedJob] = useState(null);
   const [viewOpen, setViewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -124,7 +124,7 @@ const handleDelete = async (id) => {
 };
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
-      <Sidebar sidebarOpen={sidebarOpen} />
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       <div className="flex-1 overflow-y-auto">
         <Topbar

@@ -5,8 +5,8 @@ export default function ViewJobModal({
 }) {
   if (!open || !job) return null;
   return (
-    <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
-      <div className="bg-white rounded-xl w-[650px] p-6">
+    <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 p-4">
+      <div className="bg-white rounded-xl w-full max-w-[650px] max-h-[90vh] overflow-y-auto p-6">
         <div className="flex justify-between items-center mb-5">
           <h2 className="text-xl font-bold">
             Job Details
@@ -18,7 +18,7 @@ export default function ViewJobModal({
             ✖
        </button>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <b>Job Code</b>
             <p>{job.job_code}</p>

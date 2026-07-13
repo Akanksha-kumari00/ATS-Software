@@ -93,8 +93,8 @@ export default function EmployeeTable({ employees, setEmployees, }) {
         };
 
   return (
-  <div className=" rounded-xl border border-gray-200 relative">
-      <table className="w-full">
+  <div className=" rounded-xl border border-gray-200 relative overflow-x-auto">
+      <table className="w-full min-w-[900px]">
         <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
           <tr>
             <th className="p-4 text-left">Name</th>
@@ -176,7 +176,7 @@ export default function EmployeeTable({ employees, setEmployees, }) {
               ✖
             </button>
             <h2 className="text-xl font-bold mb-5">Edit Employee</h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <input
                 value={formData.name}
                 onChange={(e) =>

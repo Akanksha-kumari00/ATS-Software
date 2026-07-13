@@ -6,7 +6,7 @@ import ResumeBankTable from "../../components/resume/ResumeBankTable";
 import { getResumes,deleteResume } from "../../services/resumeService";
 
 export default function ResumeBank() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 768);
   const [resumes, setResumes] = useState([]);
 
   const [filters, setFilters] = useState({
@@ -82,7 +82,7 @@ const handleDelete = async (id) => {
 };
   return (
     <div className="flex h-screen bg-[#f5f7fb]">
-      <Sidebar sidebarOpen={sidebarOpen} />
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="flex-1 overflow-y-auto">
         <Topbar
                 sidebarOpen={sidebarOpen}

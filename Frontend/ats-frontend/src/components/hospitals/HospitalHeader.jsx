@@ -71,7 +71,7 @@ const cities = [...new Set(
   return (
     <div className="space-y-3">
       {/* Stats */}
-      <div className="grid grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
         {cards.map((item, index) => {
           const Icon = item.icon;
           return (
@@ -101,7 +101,7 @@ const cities = [...new Set(
       </div>
       {/* Filters */}
    
-        <div className="grid grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
           {/* Search */}
           <div className="relative col-span-2">
             <Search

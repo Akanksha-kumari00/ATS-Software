@@ -31,7 +31,8 @@ function UpcomingInterviews() {
           View All
         </button>
       </div>
-      <table className="w-full text-sm">
+      <div className="overflow-x-auto">
+      <table className="w-full min-w-[500px] text-sm">
         <thead>
           <tr className="border-b text-gray-500">
             <th className="text-left py-2">
@@ -66,6 +67,7 @@ function UpcomingInterviews() {
           }
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

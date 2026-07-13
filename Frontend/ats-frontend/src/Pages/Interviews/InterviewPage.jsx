@@ -9,7 +9,7 @@ import ScheduleInterviewModal from "../../components/Interviews/ScheduleIntervie
 import { getInterviews,  getInterviewStats, } from "../../services/interviewServices";
 export default function InterviewPage() {
   const [interviews, setInterviews] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 768);
   const [openModal, setOpenModal] = useState(false);
   const [stats, setStats] = useState({
   today: 0,
@@ -67,7 +67,7 @@ useEffect(() => {
 }, [fetchData]);
   return (
       <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
-      <Sidebar sidebarOpen={sidebarOpen} />
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="flex-1 bg-gray-50 min-h-screen overflow-y-auto">
         <Topbar
           sidebarOpen={sidebarOpen}

@@ -10,7 +10,7 @@ import { exportApplications } from "../../utils/exportApplications";
 import ViewApplicationModal from "../../components/Applications/ViewApplicationModal";
 import EditApplicationModal from "../../components/Applications/EditApplicationModal";
 function ApplicationsPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 768);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [viewOpen, setViewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -131,7 +131,7 @@ const paginatedApplications = filteredApplications.slice(
 );
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
-      <Sidebar sidebarOpen={sidebarOpen} />
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="flex-1 overflow-y-auto">
         <Topbar
           sidebarOpen={sidebarOpen}

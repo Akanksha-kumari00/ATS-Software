@@ -52,7 +52,7 @@ function StatsCards({ stats }) {
   ];
 
   return (
-<div className="grid grid-cols-6 gap-2 mt-1">
+<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mt-1">
       {
         cards.map((card) => (
           <div
