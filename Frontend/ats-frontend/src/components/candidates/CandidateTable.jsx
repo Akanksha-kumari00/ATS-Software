@@ -80,7 +80,6 @@ function CandidateTable({
                     </p>
                   </div>
                 </td>
-                {/* Profile */}
                 <td className="p-2">
                   <p>{c.education}</p>
                   <p className="text-xs text-gray-500">
@@ -140,12 +139,11 @@ function CandidateTable({
                     </span>
                   )}
                 </td>
-                {/* Gender */}
+                
                 <td className=" text-xs text-gray-600">
                   {c.gender || "-"}
                 </td>
 
-                {/* Action */}
               <td
                 className="p-2  relative"
                 onClick={(e) => e.stopPropagation()}

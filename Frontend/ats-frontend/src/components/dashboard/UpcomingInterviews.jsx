@@ -75,7 +75,6 @@ function UpcomingInterviews() {
                   </td>
                 </tr>
               )}
-          
         </tbody>
       </table>
       </div>

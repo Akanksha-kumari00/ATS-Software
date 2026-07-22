@@ -15,16 +15,12 @@ export default function InterviewTable({
             Manage all scheduled candidate interviews
           </p>
         </div>
-
         <div className="text-sm text-gray-500">
           Total : <span className="font-semibold">{data.length}</span>
         </div>
       </div>
-
       <div className="overflow-x-auto">
-
         <table className="w-full min-w-[1200px]">
-
           <thead className="bg-slate-50 border-b">
             <tr className="text-left text-xs font-semibold uppercase text-gray-500">
               <th className="px-6 py-4">Date</th>

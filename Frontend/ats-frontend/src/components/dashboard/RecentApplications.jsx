@@ -67,7 +67,6 @@ function RecentApplications() {
               </tr>
             </thead>
               <tbody>
-              
                    {applications.length > 0 ? (
                   applications.map((item) => (
                     <tr

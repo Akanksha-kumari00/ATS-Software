@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { Bell } from "lucide-react";
-
 function NotificationCard() {
   const [notifications, setNotifications] = useState({
     interviewReminder: true,
     candidateStatus: true,
     emailNotification: true,
   });
-  const handleToggle = (field) => {
+const handleToggle = (field) => {
     setNotifications((prev) => ({
       ...prev,
       [field]: !prev[field],
     }));
-  };
+  };  
   const handleSave = () => {
     console.log(notifications);
     alert("Notification settings saved successfully.");
@@ -25,16 +24,12 @@ function NotificationCard() {
           Notifications
         </h2>
       </div>
-
       <div className="space-y-5">
-
         <label className="flex items-center justify-between border rounded-lg p-4">
-
           <div>
             <p className="font-medium">
               Interview Reminder
             </p>
-
             <p className="text-sm text-gray-500">
               Receive reminder before interview.
             </p>
