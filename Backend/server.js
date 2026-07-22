@@ -1,6 +1,9 @@
+const db = require("./config/db");
 require("dotenv").config();
+require("./cron/interviewReminder");
 const express = require("express");
 const cors = require("cors");
+
 const candidateRoutes = require("./routes/candidateRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const employeeRoutes = require("./routes/employeeRoutes");
@@ -8,7 +11,13 @@ const applicationRoutes = require("./routes/applicationRoutes");
 const hospitalRoutes = require("./routes/hospitalRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
 const mailRoutes = require("./routes/mailRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
+const userRoutes = require("./routes/userRoutes");
+const listenEmailReplies =
+  require("./services/emailReplyService");
 
+
+listenEmailReplies();
 
 const app = express();
 app.use(cors());
@@ -29,12 +38,14 @@ app.get("/test-get", (req, res) => {
 // Routes
 app.use("/api/candidates", candidateRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/employees",employeeRoutes);
-app.use("/api/applications",applicationRoutes);
+app.use("/api/employees", employeeRoutes);
+app.use("/api/applications", applicationRoutes);
 app.use("/api/jobs", require("./routes/jobRoutes"));
 app.use("/api/hospitals", hospitalRoutes);
 app.use("/api/resume", resumeRoutes);
 app.use("/api/mail", mailRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/users", userRoutes);
 // Server
 const PORT = 5000;
 app.listen(PORT, () => {

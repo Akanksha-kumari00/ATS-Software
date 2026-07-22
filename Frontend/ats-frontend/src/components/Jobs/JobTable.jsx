@@ -1,10 +1,10 @@
+import { Phone, Mail } from "lucide-react";
 export default function JobTable({ 
   jobs = [],
   onView,
   onEdit,
   onDelete,
 }) {
-
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <div className="overflow-x-auto">
@@ -91,20 +91,59 @@ export default function JobTable({
                 <td className="w-[90px] px-2 py-2 text-center text-[12px] whitespace-nowrap">
                   {new Date(job.opening_date).toLocaleDateString("en-IN")}
                 </td>
-                <td className="w-[190px] px-2 py-2">
-                  <div className="font-semibold text-gray-900 leading-4">
-                    {job.contact_person}
-                  </div>
-                  <div className="text-[11px] text-indigo-600 leading-4">
-                    {job.contact_designation}
-                  </div>
-                  <div className="text-[11px] text-blue-600 leading-4">
-                    📞 {job.mobile}
-                  </div>
-                    <div className="text-[11px] text-gray-500 leading-4 truncate">
-                      ✉ {job.email}
+               <td className="px-3 py-2">
+                {job.contacts?.length > 0 ? (
+                  job.contacts.map((c, index) => (
+                    <div key={index} className="mb-2">
+                      <p className="text-sm font-semibold text-black">
+                        {c.contact_person}
+                      </p>
+
+                      <p className="text-xs text-violet-600">
+                        {c.contact_designation}
+                      </p>
+
+                <div className="flex items-center gap-1 text-xs">
+                  <Phone
+                    size={12}
+                    className="text-red-500"
+                    fill="currentColor"
+                  />
+                  <span className="text-blue-600">
+                    {c.mobile}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1 text-xs">
+                  <Mail
+                    size={12}
+                    className="text-slate-500"
+                  />
+                  <span className="text-slate-600">
+                    {c.email}
+                  </span>
+                </div>
+              </div>
+                  ))
+              ) : (
+                 <div className="space-y-0.5">
+                      <p className="text-sm font-semibold">
+                        {job.contact_person || "-"}
+                      </p>
+                      <p className="text-xs text-slate-500">[]
+                        {job.contact_designation || "-"}
+                      </p>
+                      <div className="flex items-center gap-1 text-xs text-slate-600">
+                        <Phone size={12} />
+                        {job.mobile || "-"}
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-slate-600">
+                        <Mail size={12} />
+                        {job.email || "-"}
+                      </div>
                     </div>
-                  </td>
+                    )}
+              </td>
                <td className="px-2 py-2 text-center">
                   {job.accommodation}
                 </td>

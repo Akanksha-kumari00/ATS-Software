@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Camera, Eye, EyeOff } from "lucide-react";
 
 function AccountCard() {
@@ -6,36 +7,139 @@ function AccountCard() {
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const [user, setUser] = useState({
-    name: "Admin User",
-    email: "admin@example.com",
-    role: "Admin",
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-    profile_image: "",
-  });
+const [user, setUser] = useState({
+  name: "",
+  email: "",
+  role: "",
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+  profile_image: "",
+});
+const [imageFile, setImageFile] = useState(null);
+useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-  const handleImage = (e) => {
-    const file = e.target.files[0];
+      const res = await axios.get(
+        "http://localhost:5000/api/users/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    if (file) {
-      setUser({
-        ...user,
-        profile_image: URL.createObjectURL(file),
-      });
+      setUser((prev) => ({
+        ...prev,
+        id: res.data.id,
+        name: res.data.name,
+        email: res.data.email,
+        role: res.data.role,
+        profile_image: res.data.profile_image
+          ? `http://localhost:5000/uploads/profile/${res.data.profile_image}`
+          : "",
+      }));
+
+    } catch (err) {
+      console.log(err);
     }
   };
 
-  const handleSave = () => {
-    console.log("User Data:", user);
+  fetchProfile();
+}, []);
 
-    // API call yaha lagao
-    // axios.put('/api/profile', user)
+const handleImage = (e) => {
+  const file = e.target.files[0];
 
-    alert("Profile Updated");
-  };
+  if (file) {
+    setImageFile(file);
 
+    setUser((prev) => ({
+      ...prev,
+      profile_image: URL.createObjectURL(file), 
+    }));
+  }
+};
+
+const handleSave = async () => {
+  try {
+    // Confirm Password Validation
+    if (
+      user.newPassword &&
+      user.newPassword !== user.confirmPassword
+    ) {
+      alert("New Password and Confirm Password do not match");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    const formData = new FormData();
+
+    formData.append("name", user.name);
+
+    if (imageFile) {
+      formData.append("profile_image", imageFile);
+    }
+
+    if (user.currentPassword) {
+      formData.append(
+        "currentPassword",
+        user.currentPassword
+      );
+    }
+
+    if (user.newPassword) {
+      formData.append(
+        "newPassword",
+        user.newPassword
+      );
+    }
+
+    const res = await axios.put(
+      "http://localhost:5000/api/users/profile",
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    // Update Local Storage
+    localStorage.setItem(
+      "user",
+      JSON.stringify(res.data.user)
+    );
+
+    // Update UI
+    setUser((prev) => ({
+      ...prev,
+      ...res.data.user,
+      profile_image: res.data.user.profile_image
+        ? `http://localhost:5000/uploads/profile/${res.data.user.profile_image}`
+        : "",
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    }));
+
+    setImageFile(null);
+
+    alert(res.data.message);
+
+  } catch (err) {
+    console.log(err);
+
+    alert(
+      err.response?.data?.message ||
+      "Something went wrong"
+    );
+  }
+};
   return (
     <div className="bg-white rounded-2xl shadow p-6">
       <h2 className="text-2xl font-semibold mb-1">Account</h2>
@@ -124,13 +228,9 @@ function AccountCard() {
               <button
                 type="button"
                 onClick={() => setShowCurrent(!showCurrent)}
-                className="absolute right-3 top-11"
+                className="absolute right-4 top-[42px] text-gray-500"
               >
-                {showCurrent ? (
-                  <EyeOff size={18} />
-                ) : (
-                  <Eye size={18} />
-                )}
+                {showCurrent ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
 
@@ -138,7 +238,7 @@ function AccountCard() {
               <label className="font-medium">
                 New Password
               </label>
-
+              
               <input
                 type={showNew ? "text" : "password"}
                 value={user.newPassword}

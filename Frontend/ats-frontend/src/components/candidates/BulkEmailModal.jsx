@@ -5,6 +5,7 @@ function BulkEmailModal({
   open,
   onClose,
   recipients = [],
+   mobiles = [],
   onSend,
 }) {
   const [subject, setSubject] = useState("");
@@ -25,6 +26,7 @@ function BulkEmailModal({
 
     onSend({
       recipients,
+       mobiles,
       subject,
       message,
     });
@@ -35,11 +37,8 @@ function BulkEmailModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl">
-
-        <div className="flex justify-between items-center border-b p-5">
-
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
+        <div className="flex justify-between items-center border-b p-3">
           <div className="flex items-center gap-2">
             <Mail className="text-blue-600" />
             <h2 className="text-xl font-semibold">
@@ -53,7 +52,7 @@ function BulkEmailModal({
 
         </div>
 
-        <div className="p-5">
+        <div className="p-3">
 
           <p className="font-medium mb-2">
             Recipients ({recipients.length})
@@ -66,7 +65,15 @@ function BulkEmailModal({
             ))}
 
           </div>
+            <p className="font-medium mb-2">
+              Mobile Numbers ({mobiles.length})
+            </p>
 
+            <div className="border rounded-lg p-3 h-28 overflow-auto text-sm bg-gray-50 mb-4">
+              {mobiles.map((mobile) => (
+                <div key={mobile}>{mobile}</div>
+              ))}
+            </div>
           <input
             className="w-full border rounded-lg p-3 mb-4"
             placeholder="Subject"
@@ -105,9 +112,7 @@ function BulkEmailModal({
           </button>
 
         </div>
-
       </div>
-
     </div>
   );
 }

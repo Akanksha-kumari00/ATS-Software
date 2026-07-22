@@ -43,21 +43,21 @@ export default function ScheduleInterviewModal({
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "candidateId") {
-      const candidate = candidates.find(
-        (c) => c.id == value
-      );
+        if (name === "candidateId") {
+          const candidate = candidates.find(
+            (c) => c.id == value
+          );
 
-      setForm({
-        candidateId: value,
-        interview_date:
-          candidate?.interview_date?.slice(0, 10) || "",
-        interview_time:
-          candidate?.interview_time || "",
-      });
+          setForm({
+            candidateId: value,
+            interview_date:
+              candidate?.interview_date?.slice(0, 10) || "",
+            interview_time:
+              candidate?.interview_time || "",
+          });
 
-      return;
-    }
+          return;
+        }
 
     setForm({
       ...form,

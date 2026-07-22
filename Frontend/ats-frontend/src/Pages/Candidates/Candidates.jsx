@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
  import axios from "axios";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
+import Pagination from "../../components/common/Pagination";
 import CandidateHeader from "../../components/candidates/CandidateHeader";
 import CandidateFilters from "../../components/candidates/CandidateFilters";
 import CandidateTable from "../../components/candidates/CandidateTable";
@@ -18,7 +19,7 @@ function Candidates() {
   const navigate = useNavigate();
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [selectedCandidates, setSelectedCandidates] = useState([]);
-const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState({
   speciality: [],
   location: [],
   hospital: [],
@@ -29,6 +30,8 @@ const [filters, setFilters] = useState({
 });
 
 const [showBulkEmail, setShowBulkEmail] = useState(false);
+const [page, setPage] = useState(1);
+const [limit] = useState(10);
   const loadCandidates = async () => {
   try {
     const data = await getCandidates();
@@ -60,7 +63,6 @@ const sendBulkEmail = async (data) => {
 };
 
  const filteredCandidates = candidates.filter((candidate) => {
-
   // Search
   const searchMatch =
     candidate.candidate_name
@@ -114,10 +116,26 @@ const sendBulkEmail = async (data) => {
     interviewMatch
   );
 });
+const totalRecords = filteredCandidates.length;
+
+const totalPages = Math.ceil(totalRecords / limit);
+
+const paginatedCandidates = filteredCandidates.slice(
+  (page - 1) * limit,
+  page * limit
+);
 const selectedEmails = filteredCandidates
   .filter((candidate) => selectedCandidates.includes(candidate.id))
   .map((candidate) => candidate.email)
   .filter(Boolean);
+
+  const selectedMobiles = filteredCandidates
+  .filter((candidate) =>
+    selectedCandidates.includes(candidate.id)
+  )
+  .map((candidate) => candidate.mobile)
+  .filter(Boolean);
+
   const handleExport = () => {
   exportCandidates(
     filteredCandidates.map((c) => ({
@@ -152,13 +170,9 @@ const handleImport = async (e) => {
       loadCandidates();
 
   } catch (err) {
-
     console.log(err);
-
     alert("Import Failed");
-
   }
-
 };
 const handleEdit = (candidate) => {
   navigate("/application", {
@@ -176,7 +190,8 @@ const handleScheduleInterview = (candidate) => {
   });
 };
 const handleSendMail = (candidate) => {
-  console.log("Send Mail", candidate);
+  setSelectedCandidates([candidate.id]); 
+  setShowBulkEmail(true);                 
 };
 
 const handleSelectCandidate = (id) => {
@@ -238,7 +253,10 @@ return (
 
         <CandidateHeader
           search={search}
-          setSearch={setSearch}
+          setSearch={setSearch} setSearch={(value) => {
+            setSearch(value);
+            setPage(1);
+          }}
           onExport={handleExport}
           onImport={handleImport}
           onAdd={() => navigate("/application")}
@@ -246,7 +264,10 @@ return (
 
         <CandidateFilters
           filters={filters}
-          setFilters={setFilters}
+          setFilters={(newFilters) => {
+            setFilters(newFilters);
+            setPage(1);
+          }}
           candidates={candidates}
         />
           <BulkActionBar
@@ -259,7 +280,7 @@ return (
             onClear={() => setSelectedCandidates([])}
           />
             <CandidateTable
-            candidates={filteredCandidates}
+            candidates={paginatedCandidates}
             selectedCandidates={selectedCandidates}
             onSelectCandidate={handleSelectCandidate}
             onSelectAll={handleSelectAll}
@@ -268,6 +289,13 @@ return (
             onDelete={handleDelete}
             onScheduleInterview={handleScheduleInterview}
             onSendMail={handleSendMail}
+            />
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              totalRecords={totalRecords}
+              limit={limit}
+              onPageChange={setPage}
             />
             {selectedCandidate && (
               <CandidateDetails
@@ -281,6 +309,7 @@ return (
                 open={showBulkEmail}
                 onClose={() => setShowBulkEmail(false)}
                 recipients={selectedEmails}
+                mobiles={selectedMobiles}
                 onSend={sendBulkEmail}
               />
 

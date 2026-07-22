@@ -30,11 +30,8 @@ export default function EmployeeTable({ employees, setEmployees, }) {
     setMode("edit");
   };
   useEffect(() => {
-
   const closeMenu = () => {
-
     setOpenMenuId(null);
-
   };
 
   document.addEventListener(
@@ -93,7 +90,8 @@ export default function EmployeeTable({ employees, setEmployees, }) {
         };
 
   return (
-  <div className=" rounded-xl border border-gray-200 relative overflow-x-auto">
+  <div className=" rounded-xl border border-gray-200 relative overflow-visible">
+    <div className="overflow-x-auto  overflow-y-hidden">
       <table className="w-full min-w-[900px]">
         <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
           <tr>
@@ -126,8 +124,9 @@ export default function EmployeeTable({ employees, setEmployees, }) {
                 <td className="text-center">{emp.cv_forwarded}</td>
                 <td className="text-center">{emp.interview_done}</td>
                 <td className="text-center">{emp.joining_status}</td>
-                <td className="p-4">
+                <td className="p-4 relative overflow-visible">
                   <div className="flex justify-center gap-2">
+                    
                    <EmployeeActionMenu
                         emp={emp}
                         onEdit={handleEdit}
@@ -143,6 +142,7 @@ export default function EmployeeTable({ employees, setEmployees, }) {
           )}
         </tbody>
       </table>
+    </div>  
       {mode === "view" && selectedEmp && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white w-[420px] p-6 rounded relative">

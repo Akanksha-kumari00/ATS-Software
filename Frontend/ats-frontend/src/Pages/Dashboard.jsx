@@ -1,6 +1,5 @@
 
 import { useEffect, useState } from "react";
-
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
 import StatsCards from "../components/dashboard/StatsCards";
@@ -18,25 +17,15 @@ function Dashboard() {
   useEffect(() => {
 
     const loadDashboard = async () => {
-
       try {
-
         const data = await getDashboardStats();
-
         setStats(data);
-
       }
-
       catch (error) {
-
         console.log(error);
-
       }
-
     };
-
     loadDashboard();
-
   }, []);
 
   return (

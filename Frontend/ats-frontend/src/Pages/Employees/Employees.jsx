@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback } from "react";
 import Sidebar from "../../components/layout/sidebar";
 import Topbar from "../../components/layout/Topbar";
@@ -40,7 +39,7 @@ useEffect(() => {
     );
   });
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
+    <div className="flex h-screen overflow-x-hidden overflow-y-auto bg-[#f5f7fb]">
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="flex-1 overflow-y-auto">
         <Topbar

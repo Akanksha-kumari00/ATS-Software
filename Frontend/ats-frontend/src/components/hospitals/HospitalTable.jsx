@@ -111,24 +111,47 @@ export default function HospitalTable({
               </td>
                 {/* Contact */}
                 <td className="px-3 py-2">
-                 <div className="space-y-0.5">
+                {hospital.contacts?.length > 0 ? (
+                  hospital.contacts.map((c, index) => (
+                    <div key={index} className="mb-2">
+                      <p className="text-sm font-semibold">
+                        {c.contact_person}
+                      </p>
+
+                      <p className="text-xs text-slate-500">
+                        {c.contact_designation}
+                      </p>
+
+                      <div className="flex items-center gap-1 text-xs text-slate-600">
+                        <Phone size={12} />
+                        {c.mobile}
+                      </div>
+
+                      <div className="flex items-center gap-1 text-xs text-slate-600">
+                        <Mail size={12} />
+                        {c.email}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="space-y-0.5">
                     <p className="text-sm font-semibold">
-                         {hospital.contact_person || "-"}
+                      {hospital.contact_person || "-"}
                     </p>
                     <p className="text-xs text-slate-500">
-                      {hospital.contact_designation || "HR"}
+                      {hospital.contact_designation || "-"}
                     </p>
-
                     <div className="flex items-center gap-1 text-xs text-slate-600">
                       <Phone size={12} />
-                      {hospital.mobile}
+                      {hospital.mobile || "-"}
                     </div>
                     <div className="flex items-center gap-1 text-xs text-slate-600">
                       <Mail size={12} />
-                      {hospital.email}
+                      {hospital.email || "-"}
                     </div>
                   </div>
-                </td>
+                )}
+              </td>
                 {/* Location */}
                 <td className="px-4 py-3">
                   <div className="flex gap-2 items-start">

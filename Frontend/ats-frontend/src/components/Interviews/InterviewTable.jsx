@@ -45,7 +45,13 @@ export default function InterviewTable({
                 />
               ))
             ) : (
-              <tr>
+             <tr>
+                <td
+                  colSpan={6}
+                  className="py-10 text-center text-gray-500 font-medium"
+                >
+                  No Scheduled Interviews Found
+                </td>
               </tr>
             )}
           </tbody>

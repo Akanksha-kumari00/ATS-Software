@@ -120,8 +120,6 @@ useEffect(() => {
   }
 );
 const [viewHospital, setViewHospital] = useState(null);
-
-
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f7fb]">
           <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />

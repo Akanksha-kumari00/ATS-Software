@@ -15,35 +15,66 @@ exports.getHospitals = async (req, res) => {
     const totalRecords = countResult.total;
     // Paginated Data
     const [rows] = await db.query(`
-      SELECT
-        h.id,
-        h.client_code,
-        h.hospital_name,
-        h.hospital_owner,
-        h.hospital_type,
-        h.beds,
-        h.city,
-        h.state,
-        h.address,
-        h.contact_person,
-        h.contact_designation,
-        h.mobile,
-        h.email,
-        h.bde_name,
-        h.bde_percentage,
-        h.agreement_days,
-        h.agreement_date,
-        h.agreement_expiry,
-        h.payment_terms,
-        h.position_summary,
-        h.remarks,
-        h.status,
-        h.created_at,
-        h.updated_at
-      FROM clients_hospitals h
-      ORDER BY h.id DESC
-      LIMIT ? OFFSET ?;
-    `, [limit, offset]);
+SELECT
+  h.*,
+  JSON_ARRAYAGG(
+    JSON_OBJECT(
+      'contact_person', hc.contact_person,
+      'contact_designation', hc.contact_designation,
+      'mobile', hc.mobile,
+      'email', hc.email
+    )
+  ) AS contacts
+FROM clients_hospitals h
+LEFT JOIN hospital_contacts hc
+ON h.id = hc.hospital_id
+GROUP BY h.id
+ORDER BY h.id DESC
+LIMIT ? OFFSET ?
+`, [limit, offset]);
+    /* const [rows] = await db.query(`
+   SELECT
+     h.id,
+     h.client_code,
+     h.hospital_name,
+     h.hospital_owner,
+     h.hospital_type,
+     h.beds,
+     h.city,
+     h.state,
+     h.address,
+     h.bde_name,
+     h.bde_percentage,
+     h.agreement_days,
+     h.agreement_date,
+     h.agreement_expiry,
+     h.payment_terms,
+     h.position_summary,
+     h.remarks,
+     h.status,
+     h.created_at,
+     h.updated_at
+   FROM clients_hospitals h
+   ORDER BY h.id DESC
+   LIMIT ? OFFSET ?
+ `, [limit, offset]);*/
+    for (const hospital of rows) {
+
+      const [contacts] = await db.query(
+
+        `SELECT
+        id,
+        contact_person,
+        contact_designation,
+        mobile,
+        email
+     FROM hospital_contacts
+     WHERE hospital_id=?`,
+        [hospital.id]
+      );
+
+      hospital.contacts = contacts;
+    }
 
     res.json({
       hospitals: rows,
@@ -65,7 +96,7 @@ exports.getHospitals = async (req, res) => {
 // Dashboard Stats
 // ========================
 
- exports.getHospitalStats = async (req, res) => {
+exports.getHospitalStats = async (req, res) => {
   try {
     const [[stats]] = await db.query(`
       SELECT
@@ -91,128 +122,114 @@ exports.getHospitals = async (req, res) => {
 // ========================
 exports.createHospital = async (req, res) => {
   try {
+    const {
+      client_code,
+      hospital_name,
+      hospital_owner,
 
-   const {
-  client_code,
-  hospital_name,
-  hospital_owner,
+      bde_name,
+      bde_percentage,
 
-  bde_name,
-  bde_percentage,
+      agreement_days,
+      agreement_date,
+      agreement_expiry,
+      payment_terms,
 
-  agreement_days,
-  agreement_date,
-  agreement_expiry,
-  payment_terms,
+      contacts = [],
 
-  contact_person,
-  contact_designation,
-  email,
-  mobile,
+      city,
+      state,
+      address,
 
-  city,
-  state,
-  address,
+      beds,
+      position_summary,
+      hospital_type,
 
-  beds,
-  position_summary,
-  hospital_type,
-
-  remarks,
-  status,
-} = req.body;
+      remarks,
+      status,
+    } = req.body;
 
     const [result] = await db.query(
       `INSERT INTO clients_hospitals
-    (
-    client_code,
-    hospital_name,
-    hospital_owner,
-
-    bde_name,
-    bde_percentage,
-
-    agreement_days,
-    agreement_date,
-    agreement_expiry,
-    payment_terms,
-
-    contact_person,
-    contact_designation,
-    email,
-    mobile,
-
-    city,
-    state,
-    address,
-
-    beds,
-    position_summary,
-    hospital_type,
-
-    remarks,
-    status
-)
-
-VALUES
-(
-?,?,?,?,?,
-?,?,?,?,?,
-?,?,?,?,?,
-?,?,?,?,?,?
-)
-  `,
+      (
+        client_code,
+        hospital_name,
+        hospital_owner,
+        bde_name,
+        bde_percentage,
+        agreement_days,
+        agreement_date,
+        agreement_expiry,
+        payment_terms,
+        city,
+        state,
+        address,
+        beds,
+        position_summary,
+        hospital_type,
+        remarks,
+        status
+      )
+      VALUES
+      (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
       [
-  client_code,
-  hospital_name,
-  hospital_owner,
-
-  bde_name,
-  bde_percentage,
-
-  agreement_days,
-  agreement_date,
-  agreement_expiry,
-  payment_terms,
-
-  contact_person,
-  contact_designation,
-  email,
-  mobile,
-
-  city,
-  state,
-  address,
-
-  beds,
-  position_summary,
-  hospital_type,
-
-  remarks,
-  status,
-]
+        client_code,
+        hospital_name,
+        hospital_owner,
+        bde_name,
+        bde_percentage,
+        agreement_days,
+        agreement_date,
+        agreement_expiry,
+        payment_terms,
+        city,
+        state,
+        address,
+        beds,
+        position_summary,
+        hospital_type,
+        remarks,
+        status,
+      ]
     );
+
+    const hospitalId = result.insertId;
+
+    // Save Contacts
+    for (const contact of contacts) {
+      await db.query(
+        `INSERT INTO hospital_contacts
+        (
+          hospital_id,
+          contact_person,
+          contact_designation,
+          mobile,
+          email
+        )
+        VALUES (?,?,?,?,?)`,
+        [
+          hospitalId,
+          contact.contact_person,
+          contact.contact_designation,
+          contact.mobile,
+          contact.email,
+        ]
+      );
+    }
 
     res.json({
       success: true,
-      id: result.insertId,
+      id: hospitalId,
     });
 
   } catch (err) {
-  console.error("Create Hospital Error:", err);
+    console.log(err);
 
-  if (err.code === "ER_DUP_ENTRY") {
-    return res.status(409).json({
+    res.status(500).json({
       success: false,
-      message: "Client Code already exists.",
+      message: err.message,
     });
   }
-
-  return res.status(500).json({
-    success: false,
-    message: "Something went wrong.",
-  });
-}
 };
 // ========================
 // Update
@@ -222,114 +239,89 @@ exports.updateHospital = async (req, res) => {
     const { id } = req.params;
 
     const {
-  client_code,
-  hospital_name,
-  hospital_owner,
+      client_code,
+      hospital_name,
+      hospital_owner,
 
-  bde_name,
-  bde_percentage,
+      bde_name,
+      bde_percentage,
 
-  agreement_days,
-  agreement_date,
-  agreement_expiry,
-  payment_terms,
-  contact_person,
-  contact_designation,
-  email,
-  mobile,
-  city,
-  state,
-  address,
-  beds,
-  position_summary,
-  hospital_type,
-  remarks,
-  status,
-} = req.body;
+      agreement_days,
+      agreement_date,
+      agreement_expiry,
+      payment_terms,
+      contacts = [],
+      city,
+      state,
+      address,
+      beds,
+      position_summary,
+      hospital_type,
+      remarks,
+      status,
+    } = req.body;
 
-   await db.query(
-  `UPDATE clients_hospitals
-SET
-client_code=?,
-hospital_name=?,
-hospital_owner=?,
-
-bde_name=?,
-bde_percentage=?,
-
-agreement_days=?,
-agreement_date=?,
-agreement_expiry=?,
-payment_terms=?,
-
-contact_person=?,
-contact_designation=?,
-email=?,
-mobile=?,
-
-city=?,
-state=?,
-address=?,
-
-beds=?,
-position_summary=?,
-hospital_type=?,
-
-remarks=?,
-status=?
-
-WHERE id=?`,
-  [
-    client_code,
-    hospital_name,
-    hospital_owner,
-
-    bde_name,
-    bde_percentage,
-
-    agreement_days,
-    agreement_date,
-    agreement_expiry,
-    payment_terms,
-
-    contact_person,
-    contact_designation,
-    email,
-    mobile,
-
-    city,
-    state,
-    address,
-
-    beds,
-    position_summary,
-    hospital_type,
-
-    remarks,
-    status,
-
-    id,
-  ]
-);
+    await db.query(
+      `UPDATE clients_hospitals
+        SET
+        client_code=?,
+        hospital_name=?,
+        hospital_owner=?,
+        bde_name=?,
+        bde_percentage=?,
+        agreement_days=?,
+        agreement_date=?,
+        agreement_expiry=?,
+        payment_terms=?,
+        city=?,
+        state=?,
+        address=?,
+        beds=?,
+        position_summary=?,
+        hospital_type=?,
+        remarks=?,
+        status=?
+        WHERE id=?`,
+      [
+        client_code,
+        hospital_name,
+        hospital_owner,
+        bde_name,
+        bde_percentage,
+        agreement_days,
+        agreement_date,
+        agreement_expiry,
+        payment_terms,
+        city,
+        state,
+        address,
+        beds,
+        position_summary,
+        hospital_type,
+        remarks,
+        status,
+        id,
+      ]
+    );
     res.json({
       success: true,
       message: "Hospital updated successfully",
     });
   } catch (err) {
-  console.error(err);
+    console.error(err);
 
-  if (err.code === "ER_DUP_ENTRY") {
-    return res.status(409).json({
+    if (err.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({
+        success: false,
+        message: "Client Code already exists.",
+      });
+    }
+
+    return res.status(500).json({
       success: false,
-      message: "Client Code already exists.",
+      message: "Something went wrong.",
     });
   }
-
-  return res.status(500).json({
-    success: false,
-    message: "Something went wrong.",
-  });
-}
 };
 // ========================
 // Delete

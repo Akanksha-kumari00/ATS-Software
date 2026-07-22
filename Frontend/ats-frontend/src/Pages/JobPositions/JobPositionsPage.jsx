@@ -10,12 +10,12 @@ import ViewJobModal from "../../components/Jobs/ViewJobModal";
 import { getJobs, getJobStats , deleteJob, updateJob,createJob,getHospitals,} from "../../services/jobService";
 import JobFormModal from "../../components/Jobs/JobFormModal";
 export default function JobPositionsPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 768);
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [viewOpen, setViewOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
-  const [hospitals, setHospitals] = useState([]);
-  const [addOpen, setAddOpen] = useState(false);
+const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 768);
+const [selectedJob, setSelectedJob] = useState(null);
+const [viewOpen, setViewOpen] = useState(false);
+const [editOpen, setEditOpen] = useState(false);
+const [hospitals, setHospitals] = useState([]);
+const [addOpen, setAddOpen] = useState(false);
 const [jobs, setJobs] = useState([]);
 const [page, setPage] = useState(1);
 const [limit] = useState(10);

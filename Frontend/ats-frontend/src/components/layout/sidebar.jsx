@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import {
   FaHome,
   FaBriefcase,
@@ -20,88 +21,84 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   // Logged in user
   const user = JSON.parse(localStorage.getItem("user"));
-  const role = user?.role;
+  const role = user?.role?.toUpperCase();
+
   // Role based menu
   const menu = [
     {
       name: "Dashboard",
       icon: <FaHome />,
       path: "/dashboard",
-      roles: ["Admin", "Recruiter", "BDE"],
+      roles: ["ADMIN", "RECRITER", "BDE"],
     },
     {
       name: "Jobs",
       icon: <FaBriefcase />,
       path: "/jobs",
-      roles: ["Admin", "BDE"],
+      roles: ["ADMIN", "BDE"],
     },
     {
       name: "Candidates",
       icon: <FaUsers />,
       path: "/candidates",
-      roles: ["Admin", "Recruiter", "BDE"],
+      roles: ["ADMIN", "RECRITER", "BDE"],
     },
     {
       name: "Applications",
       icon: <FaClipboardList />,
       path: "/applications",
-      roles: ["Admin", "Recruiter"],
+      roles: ["ADMIN", "RECRITER"],
     },
     {
       name: "Interviews",
       icon: <FaCalendarAlt />,
       path: "/interview",
-      roles: ["Admin", "Recruiter"],
+      roles: ["ADMIN", "RECRITER"],
     },
     {
       name: "Clients",
       icon: <FaGift />,
       path: "/clients",
-      roles: ["Admin", "BDE"],
+      roles: ["ADMIN", "BDE"],
     },
     {
       name: "Employees",
       icon: <FaUserTie />,
       path: "/employees",
-      roles: ["Admin"],
+      roles: ["ADMIN"],
     },
     {
       name: "Resume Bank",
       icon: <FaFilePdf />,
       path: "/resumebank",
-      roles: ["Admin", "Recruiter"],
+      roles: ["ADMIN", "RECRITER"],
     },
     {
       name: "Settings",
       icon: <FaCog />,
       path: "/settings",
-      roles: ["Admin", "Recruiter", "BDE"],
+      roles:["ADMIN", "RECRITER", "BDE"],
     },
   ];
+
+  const allowedMenu = menu.filter((item) => item.roles.includes(role));
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/");
   };
 
-  // Sirf accessible menu
-  const allowedMenu = menu.filter((item) =>
-    item.roles.includes(role)
-  );
-
   return (
     <>
-      
+      {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-30 bg-black/50 md:hidden"
-          onClick={() =>
-            setSidebarOpen && setSidebarOpen(false)
-          }
+          onClick={() => setSidebarOpen && setSidebarOpen(false)}
         />
       )}
 
-      
+      {/* Sidebar */}
       <div
         className={`
           fixed md:relative
@@ -123,14 +120,14 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
           shrink-0
         `}
       >
-       
+        {/* Logo */}
         <div className="h-16 md:h-20 flex items-center justify-center border-b border-slate-800">
           <h1 className="text-xl font-bold">
             {sidebarOpen ? "ATS Portal" : "ATS"}
           </h1>
         </div>
 
-        
+        {/* Menu */}
         <div className="flex-1 px-3 py-4 space-y-1">
           {allowedMenu.map((item, index) => (
             <div
@@ -153,28 +150,28 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               `}
             >
               {item.icon}
-              {sidebarOpen && (
-                <span>{item.name}</span>
-              )}
+              {sidebarOpen && <span>{item.name}</span>}
             </div>
           ))}
         </div>
 
-        
+        {/* Logout Button */}
         <div className="border-t border-slate-800 p-3">
           <div
             onClick={() => setShowLogoutModal(true)}
             className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 hover:bg-red-600"
           >
             <FaSignOutAlt />
-            {sidebarOpen && "Logout"}
+            {sidebarOpen && <span>Logout</span>}
           </div>
         </div>
+      </div>
 
-       
-        {showLogoutModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div className="w-80 max-w-[90vw] rounded-2xl bg-white p-6 shadow-2xl">
+      {/* Logout Modal - Full Screen */}
+      {showLogoutModal &&
+        createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div className="w-80 max-w-[90vw] rounded-2xl bg-white p-6 shadow-2xl animate-scaleIn">
               <div className="flex justify-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
                   <FaSignOutAlt className="text-3xl text-red-600" />
@@ -186,31 +183,28 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               </h2>
 
               <p className="mt-2 text-center text-sm text-gray-500">
-                Are you sure you want to logout from
-                your account?
+                Are you sure you want to logout from your account?
               </p>
 
               <div className="mt-6 flex gap-3">
                 <button
-                  onClick={() =>
-                    setShowLogoutModal(false)
-                  }
-                  className="flex-1 rounded-lg border border-gray-300 bg-white py-2 font-medium text-gray-700 hover:bg-gray-100"
+                  onClick={() => setShowLogoutModal(false)}
+                  className="flex-1 rounded-lg border border-gray-300 bg-white py-2 font-medium text-gray-700 transition hover:bg-gray-100"
                 >
                   Cancel
                 </button>
 
                 <button
                   onClick={handleLogout}
-                  className="flex-1 rounded-lg bg-red-600 py-2 font-medium text-white hover:bg-red-700"
+                  className="flex-1 rounded-lg bg-red-600 py-2 font-medium text-white transition hover:bg-red-700"
                 >
                   Logout
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
-      </div>
     </>
   );
 }

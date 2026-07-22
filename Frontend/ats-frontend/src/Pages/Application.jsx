@@ -53,7 +53,10 @@ const [formData, setFormData] = useState({
   };
   const handleSubmit = async (e) => {
   e.preventDefault();
-
+ if (!/^[0-9]{10}$/.test(formData.mobile)) {
+    alert("Enter correct number ");
+    return;
+  }
   try {
     const data = new FormData();
 
@@ -76,7 +79,7 @@ const [formData, setFormData] = useState({
         formData.interview_date.split("T")[0]
       );
     }
-
+    
     if (isEdit) {
       await updateCandidate(editCandidate.id, data);
       alert("Candidate Updated Successfully");
@@ -84,9 +87,7 @@ const [formData, setFormData] = useState({
       await addCandidate(data);
       alert("Candidate Added Successfully");
     }
-
     navigate("/candidates");
-
   } catch (error) {
     console.log(error);
     alert("Save Failed");
@@ -152,13 +153,22 @@ const handleFileChange = (e) => {
                 className="border p-3 rounded-xl"
               />
               <input
-                required
-                name="mobile"
-                 value={formData.mobile || ""}
-                placeholder="Mobile"
-                onChange={handleChange}
-                className="border p-3 rounded-xl"
-              />
+                  required
+                  name="mobile"
+                  value={formData.mobile || ""}
+                  placeholder="Mobile"
+                  maxLength={10}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, ""); 
+                    handleChange({
+                      target: {
+                        name: "mobile",
+                        value: value
+                      }
+                    });
+                  }}
+                  className="border p-3 rounded-xl"
+                />
               <input
                 name="email"
                  value={formData.email || ""}

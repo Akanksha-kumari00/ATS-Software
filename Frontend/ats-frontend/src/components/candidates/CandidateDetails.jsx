@@ -54,6 +54,7 @@ function CandidateDetails({ candidate, onClose }) {
             <div className="space-y-3 text-sm">
 
               <div className="flex gap-3">
+               
                 <Phone size={16} className="text-gray-500 mt-1" />
                 <span>{candidate.mobile || "-"}</span>
               </div>
@@ -88,14 +89,18 @@ function CandidateDetails({ candidate, onClose }) {
                 <MapPin size={16} className="text-gray-500 mt-1" />
                 <span>{candidate.hospital_location || "-"}</span>
               </div>
-
+          
+          <div className="flex justify-between ">
+            <span className="text-gray-500">Recruiter</span>
+            <span>{candidate.recruiter_name || "-"}</span>
+          </div>
             </div>
 
           </div>
 
           {/* Profile */}
           <div className="bg-gray-50 rounded-xl p-4">
-
+         
             <div className="flex items-center gap-2 mb-3">
               <GraduationCap
                 className="text-purple-600"
@@ -109,7 +114,7 @@ function CandidateDetails({ candidate, onClose }) {
             <div className="space-y-3 text-sm">
 
               <div className="flex justify-between">
-                <span className="text-gray-500">
+                <span className="text-gray-500 mt-1">
                   Education
                 </span>
                 <span>{candidate.education || "-"}</span>
@@ -123,29 +128,25 @@ function CandidateDetails({ candidate, onClose }) {
               </div>
 
              <div className="flex items-center justify-between">
-  <div className="flex items-center gap-2 text-gray-600">
-    <Briefcase size={16} />
-    <span>Experience</span>
-  </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Briefcase size={16} />
+                  <span>Experience</span>
+                </div>
 
-  <span className="font-medium">
-    {candidate.experience || "-"}
-  </span>
-</div>
-
-<div className="flex items-center justify-between">
-  <div className="flex items-center gap-2 text-gray-600">
-    <IndianRupee size={16} />
-    <span>Salary</span>
-  </div>
-
-  <span className="font-medium">
-    {candidate.salary_expectation || "-"}
-  </span>
-</div>
-
+                <span className="font-medium">
+                  {candidate.experience || "-"}
+                </span>
+              </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <IndianRupee size={16} />
+                    <span>Salary</span>
+                  </div>
+                  <span className="font-medium">
+                    {candidate.salary_expectation || "-"}
+                  </span>
+                </div>
             </div>
-
           </div>
 
           {/* Interview */}
@@ -192,6 +193,7 @@ function CandidateDetails({ candidate, onClose }) {
                 <span>
                   {candidate.interview_time || "-"}
                 </span>
+              
               </div>
 
             </div>

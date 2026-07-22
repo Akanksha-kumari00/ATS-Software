@@ -13,7 +13,6 @@ function BulkActionBar({
   onExport,
   onDelete,
   onClear,
-  
 }) {
    const navigate = useNavigate();
   if (selectedCount === 0) return null;

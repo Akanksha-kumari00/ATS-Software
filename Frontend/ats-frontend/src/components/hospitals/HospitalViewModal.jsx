@@ -77,9 +77,8 @@ export default function HospitalViewModal({
           {/* Hospital Info */}
 
           <div className="grid md:grid-cols-2 gap-5">
-
+            
             <div className="border rounded-xl p-5">
-
               <h3 className="font-semibold mb-4 flex items-center gap-2">
                 <Building2 size={18} />
                 Hospital Information
@@ -135,65 +134,56 @@ export default function HospitalViewModal({
                   <span>Remarks</span>
                   <strong>{hospital.remarks || "-"}</strong>
                 </div>
-
               </div>
-
             </div>
 
             {/* Contact */}
-
             <div className="border rounded-xl p-5">
-
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <User size={18} />
-                Contact Information
-              </h3>
-
-              <div className="space-y-3 text-sm">
-
-                <div className="flex items-center gap-2">
-                  <User size={15} />
-                  {hospital.contact_person || "-"}
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <FileText size={15} />
-                  {hospital.contact_designation || "-"}
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Phone size={15} />
-                  {hospital.mobile || "-"}
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Mail size={15} />
-                  {hospital.email || "-"}
-                </div>
-
-              </div>
-
+                <h3 className="font-semibold mb-4 flex items-center gap-2">
+                  <User size={18} />
+                  Contact Information
+                </h3>
+            {hospital.contacts?.length ? (
+              hospital.contacts.map((contact, index) => (
+                <div
+                  key={index}
+                  className="border rounded-lg p-3 mb-3 last:mb-0"
+                >
+                  <div className="flex items-center gap-2">
+                    <User size={15} />
+                    <strong>{contact.contact_person}</strong>
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <FileText size={15} />
+                    {contact.contact_designation}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Phone size={15} />
+                    {contact.mobile}
+                  </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Mail size={15} />
+                      {contact.email}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>No Contacts Available</p>
+              )}
             </div>
-
             {/* Address */}
-
             <div className="border rounded-xl p-5">
-
               <h3 className="font-semibold mb-4 flex items-center gap-2">
                 <MapPin size={18} />
                 Address
               </h3>
-
               <div className="space-y-3 text-sm">
-
                 <div>
                   <strong>City :</strong> {hospital.city || "-"}
                 </div>
-
                 <div>
                   <strong>State :</strong> {hospital.state || "-"}
                 </div>
-
                 <div>
                   <strong>Address :</strong>
                   <br />
@@ -205,9 +195,7 @@ export default function HospitalViewModal({
             </div>
 
             {/* Agreement */}
-
             <div className="border rounded-xl p-5 md:col-span-2">
-
               <h3 className="font-semibold mb-4 flex items-center gap-2">
                 <Calendar size={18} />
                 Agreement Details

@@ -16,9 +16,6 @@ function SettingsPage() {
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
         />
-      
-        
-
           {/* Cards */}
           <div className="space-y-6">
             <AccountCard />

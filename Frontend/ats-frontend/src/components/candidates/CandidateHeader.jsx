@@ -8,15 +8,10 @@ function CandidateHeader({
 }) {
   return (
     <div className="bg-white rounded-xl shadow border border-gray-200 p-4 mb-4">
-
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-
         {/* Search */}
-
         <div className="relative w-full md:flex-1">
-
           <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-
           <input
             type="text"
             placeholder="Search candidate by Name, Email or Mobile..."
@@ -26,7 +21,6 @@ function CandidateHeader({
           />
 
         </div>
-
         {/* Buttons */}
         <div className="flex flex-wrap items-center gap-3">
           <button

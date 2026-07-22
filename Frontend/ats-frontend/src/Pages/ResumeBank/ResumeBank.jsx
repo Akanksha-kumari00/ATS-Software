@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
+import Pagination from "../../components/common/Pagination";
 import ResumeFilters from "../../components/resume/ResumeFilters";
 import ResumeBankTable from "../../components/resume/ResumeBankTable";
 import { getResumes,deleteResume } from "../../services/resumeService";
@@ -8,7 +9,8 @@ import { getResumes,deleteResume } from "../../services/resumeService";
 export default function ResumeBank() {
   const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 768);
   const [resumes, setResumes] = useState([]);
-
+const [page, setPage] = useState(1);
+const [limit] = useState(10);
   const [filters, setFilters] = useState({
     search: "",
     specialization: "",
@@ -53,7 +55,6 @@ export default function ResumeBank() {
     };
 
     setFilters(reset);
-
     await loadResumes(reset);
   };
 const handleView = (resume) => {
@@ -80,6 +81,15 @@ const handleDelete = async (id) => {
     console.log(err);
   }
 };
+const totalRecords = resumes.length;
+
+const totalPages = Math.ceil(totalRecords / limit);
+
+const paginatedResumes = resumes.slice(
+  (page - 1) * limit,
+  page * limit
+);
+
   return (
     <div className="flex h-screen bg-[#f5f7fb]">
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
@@ -99,10 +109,17 @@ const handleDelete = async (id) => {
           />
           <div className="bg-white rounded-xl shadow p-4">
            <ResumeBankTable
-            resumes={resumes}
+            resumes={paginatedResumes}
             onView={handleView}
             onDownload={handleDownload}
             onDelete={handleDelete}
+          />
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            totalRecords={totalRecords}
+            limit={limit}
+            onPageChange={setPage}
           />
           </div>
         </div>

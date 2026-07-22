@@ -16,10 +16,15 @@ const initialForm = {
   agreement_expiry: "",
   payment_terms: "",
 
-  contact_person: "",
-  contact_designation: "",
-  email: "",
-  mobile: "",
+ contacts: [
+  {
+    contact_person: "",
+    contact_designation: "",
+    email: "",
+    mobile: "",
+  },
+],
+ 
 
   city: "",
   state: "",
@@ -60,12 +65,51 @@ export default function AddHospitalModal({
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave(form);
-  };
+  e.preventDefault();
+  for (const contact of form.contacts) {
+    if (!/^\d{10}$/.test(contact.mobile)) {
+      alert("Mobile number must be exactly 10 digits");
+      return;
+    }
+  }
+
+  console.log(form.contacts);
+  onSave(form);
+};
 
   if (!open) return null;
+const handleContactChange = (index, e) => {
+  const updated = [...form.contacts];
 
+  updated[index][e.target.name] = e.target.value;
+
+  setForm({
+    ...form,
+    contacts: updated,
+  });
+};
+
+const addContact = () => {
+  setForm({
+    ...form,
+    contacts: [
+      ...form.contacts,
+      {
+        contact_person: "",
+        contact_designation: "",
+        email: "",
+        mobile: "",
+      },
+    ],
+  });
+};
+
+const removeContact = (index) => {
+  setForm({
+    ...form,
+    contacts: form.contacts.filter((_, i) => i !== index),
+  });
+};
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -124,20 +168,92 @@ export default function AddHospitalModal({
 
           {/* CONTACT */}
           <div className="border-t pt-4">
-            <h3 className="font-semibold mb-3">Contact</h3>
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-semibold">Contacts</h3>
 
-            <div className="grid md:grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    onClick={addContact}
+                    className="px-3 py-1 bg-indigo-600 text-white rounded-lg"
+                  >
+                    + Add Contact
+                  </button>
+                </div>
 
-              <input name="contact_person" placeholder="Contact Person" value={form.contact_person} onChange={handleChange} className="border p-3 rounded-xl" />
+                  {form.contacts.map((contact, index) => (
+                    <div
+                      key={index}
+                      className="border rounded-xl p-4 mb-4"
+                    >
+                      <div className="flex justify-between mb-3">
+                        <h4 className="font-medium">
+                          Contact {index + 1}
+                        </h4>
 
-              <input name="contact_designation" placeholder="Designation" value={form.contact_designation} onChange={handleChange} className="border p-3 rounded-xl" />
+                        {form.contacts.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeContact(index)}
+                            className="text-red-500"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
 
-              <input name="email" placeholder="Email" value={form.email} onChange={handleChange} className="border p-3 rounded-xl" />
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <input
+                        name="contact_person"
+                        placeholder="Contact Person"
+                        value={contact.contact_person}
+                        onChange={(e) =>
+                          handleContactChange(index, e)
+                        }
+                        className="border p-3 rounded-xl"
+                      />
 
-              <input name="mobile" placeholder="Mobile" value={form.mobile} onChange={handleChange} className="border p-3 rounded-xl" />
+                      <input
+                        name="contact_designation"
+                        placeholder="Designation (HR / Owner / Reception)"
+                        value={contact.contact_designation}
+                        onChange={(e) =>
+                          handleContactChange(index, e)
+                        }
+                        className="border p-3 rounded-xl"
+                      />
+
+                    <input
+                      name="email"
+                      placeholder="Email"
+                      value={contact.email}
+                      onChange={(e) =>
+                        handleContactChange(index, e)
+                      }
+                      className="border p-3 rounded-xl"
+                    />
+
+                    <input
+                      type="text"
+                      name="mobile"
+                      placeholder="Mobile"
+                      value={contact.mobile}
+                      maxLength={10}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+
+                        handleContactChange(index, {
+                          target: {
+                            name: "mobile",
+                            value,
+                          },
+                        });
+                      }}
+                      className="border p-3 rounded-xl"
+                    />
+              </div>
             </div>
-          </div>
-
+          ))}
+        </div>
           {/* ADDRESS */}
           <div className="border-t pt-4">
             <h3 className="font-semibold mb-3">Address</h3>

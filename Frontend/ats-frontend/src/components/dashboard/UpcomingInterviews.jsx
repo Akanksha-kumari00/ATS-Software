@@ -48,6 +48,7 @@ function UpcomingInterviews() {
         </thead>
         <tbody>
           {
+              interviews.length > 0 ? (
            interviews.map((item)=>(
               <tr
                 key={item.id}
@@ -63,8 +64,18 @@ function UpcomingInterviews() {
                   {item.interview_time}
                 </td>
               </tr>
-            ))
-          }
+               ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={3}
+                    className="py-10 text-center text-gray-500 font-medium"
+                  >
+                    No Upcoming Interviews Found
+                  </td>
+                </tr>
+              )}
+          
         </tbody>
       </table>
       </div>

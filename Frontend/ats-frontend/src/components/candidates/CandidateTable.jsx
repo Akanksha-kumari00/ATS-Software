@@ -21,7 +21,6 @@ function CandidateTable({
     <div className="overflow-x-auto">
         <table className="min-w-[1250px] w-full text-sm">
           {/* HEADER */}
-          
           <thead className="bg-gray-50 text-gray-600 sticky top-0 z-10 text-xs uppercase">
             
             <tr>
@@ -49,7 +48,8 @@ function CandidateTable({
 
           {/* BODY */}
           <tbody className="divide-y">
-            {candidates.map((c) => (
+             {candidates.length > 0 ? (
+          candidates.map((c) => (
               
               <tr
                 key={c.id}
@@ -236,7 +236,16 @@ function CandidateTable({
                      </Menu>
             </td>
               </tr>
-            ))}
+               ))
+              ) : (<tr>
+                  <td
+                    colSpan={10}
+                    className="text-center py-8 text-gray-500 font-medium"
+                  >
+                    No Candidates Found
+                  </td>
+                </tr>
+              )}
           </tbody>
         </table>
        </div>

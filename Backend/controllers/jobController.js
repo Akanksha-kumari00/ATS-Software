@@ -16,7 +16,7 @@ exports.getJobStats = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-// GET a job
+// GET Jobs with Pagination
 // GET Jobs with Pagination
 exports.getJobs = async (req, res) => {
   try {
@@ -41,18 +41,10 @@ exports.getJobs = async (req, res) => {
           jp.position_title LIKE ?
           OR jp.specialization LIKE ?
           OR h.hospital_name LIKE ?
-          OR h.contact_person LIKE ?
-          OR h.contact_designation LIKE ?
-          OR h.mobile LIKE ?
-          OR h.email LIKE ?
         )
       `;
 
       params.push(
-        `%${search}%`,
-        `%${search}%`,
-        `%${search}%`,
-        `%${search}%`,
         `%${search}%`,
         `%${search}%`,
         `%${search}%`
@@ -84,19 +76,15 @@ exports.getJobs = async (req, res) => {
     const totalRecords = countRows[0].totalRecords;
     const totalPages = Math.ceil(totalRecords / pageSize);
 
-    // Paginated Data
-    const [rows] = await db.query(
+    // Jobs
+    const [jobs] = await db.query(
       `
       SELECT
         jp.*,
         h.hospital_name,
         h.city,
         h.state,
-        h.beds,
-        h.contact_person,
-        h.contact_designation,
-        h.mobile,
-        h.email
+        h.beds
       FROM job_positions jp
       LEFT JOIN clients_hospitals h
       ON jp.hospital_id = h.id
@@ -109,8 +97,26 @@ exports.getJobs = async (req, res) => {
       [...params, pageSize, offset]
     );
 
+    // Attach Contacts (same structure as Client Module)
+    for (const job of jobs) {
+      const [contacts] = await db.query(
+        `
+        SELECT
+          contact_person,
+          contact_designation,
+          mobile,
+          email
+        FROM hospital_contacts
+        WHERE hospital_id = ?
+        `,
+        [job.hospital_id]
+      );
+
+      job.contacts = contacts;
+    }
+
     res.json({
-      data: rows,
+      data: jobs,
       page: currentPage,
       limit: pageSize,
       totalRecords,
@@ -197,11 +203,11 @@ exports.updateJob = async (req, res) => {
     } = req.body;
     let formattedDate = opening_date;
 
-if (opening_date) {
-  formattedDate = new Date(opening_date)
-    .toISOString()
-    .split("T")[0];
-}
+    if (opening_date) {
+      formattedDate = new Date(opening_date)
+        .toISOString()
+        .split("T")[0];
+    }
     await db.query(
       `UPDATE job_positions SET
         position_title=?,

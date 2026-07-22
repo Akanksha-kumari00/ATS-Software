@@ -153,7 +153,7 @@ router.post("/", upload.single("cv"), async (req, res) => {
       hospital_location,
       cv_forward_date,
       salary_expectation,
-      experience,  
+      experience,
       status,
       interview_status,
       remarks,
@@ -262,7 +262,7 @@ router.post("/", upload.single("cv"), async (req, res) => {
       cv_path,
       cv_forward_date,
       salary_expectation,
-      experience,  
+      experience,
       status,
       interview_status,
       remarks,
@@ -396,26 +396,24 @@ router.get("/:id", async (req, res) => {
       "SELECT * FROM candidates WHERE id = ?",
       [id]
     );
-          if (result.length === 0) {
-            return res.status(404).json({
-              message: "Candidate not found"
-            });
-          }
-          res.json(result[0]);
-        }
-        catch (err) {
-          console.error(err);
-          res.status(500).json({
-            message: err.message
-          });
+    if (result.length === 0) {
+      return res.status(404).json({
+        message: "Candidate not found"
+      });
+    }
+    res.json(result[0]);
+  }
+  catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: err.message
+    });
   }
 });
 // =======================
 // Update Candidate
 // =======================
 router.put("/:id", upload.single("cv"), async (req, res) => {
-  console.log("BODY:", req.body);
-  console.log("FILE:", req.file);
 
   try {
     const { id } = req.params;
@@ -455,7 +453,7 @@ router.put("/:id", upload.single("cv"), async (req, res) => {
     let cv_name = rows[0].cv_name;
     let cv_path = rows[0].cv_path;
 
-  
+
     if (req.file) {
       cv_name = req.file.originalname;
       cv_path = req.file.path.replace(/\\/g, "/");
@@ -509,18 +507,18 @@ router.put("/:id", upload.single("cv"), async (req, res) => {
         id,
       ]
     );
-// =======================
-// Resume Bank Sync
-// =======================
-if (req.file) {
-  const [resumeRows] = await db.query(
-    "SELECT id FROM resume_bank WHERE mobile = ?",
-    [mobile]
-  );
+    // =======================
+    // Resume Bank Sync
+    // =======================
+    if (req.file) {
+      const [resumeRows] = await db.query(
+        "SELECT id FROM resume_bank WHERE mobile = ?",
+        [mobile]
+      );
 
-  if (resumeRows.length > 0) {
-    await db.query(
-      `
+      if (resumeRows.length > 0) {
+        await db.query(
+          `
       UPDATE resume_bank
       SET
         candidate_name = ?,
@@ -529,18 +527,18 @@ if (req.file) {
         uploaded_date = NOW()
       WHERE mobile = ?
       `,
-      [
-        candidate_name,
-        specialization,
-        cv_path,
-        mobile,
-      ]
-    );
+          [
+            candidate_name,
+            specialization,
+            cv_path,
+            mobile,
+          ]
+        );
 
-    console.log("Resume Bank Updated");
-  } else {
-    await db.query(
-      `
+        console.log("Resume Bank Updated");
+      } else {
+        await db.query(
+          `
       INSERT INTO resume_bank
       (
         candidate_name,
@@ -550,17 +548,17 @@ if (req.file) {
       )
       VALUES (?,?,?,?)
       `,
-      [
-        candidate_name,
-        mobile,
-        specialization,
-        cv_path,
-      ]
-    );
+          [
+            candidate_name,
+            mobile,
+            specialization,
+            cv_path,
+          ]
+        );
 
-    console.log("Resume Bank Inserted");
-  }
-}
+        console.log("Resume Bank Inserted");
+      }
+    }
     res.json({
       message: "Updated Successfully",
     });
@@ -571,7 +569,7 @@ if (req.file) {
       message: err.message,
     });
   }
-  
+
 });
 // =======================
 // Delete Candidate

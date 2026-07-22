@@ -67,7 +67,8 @@ function RecentApplications() {
               </tr>
             </thead>
               <tbody>
-                {
+              
+                   {applications.length > 0 ? (
                   applications.map((item) => (
                     <tr
                       key={item.id}
@@ -108,8 +109,18 @@ function RecentApplications() {
                         {item.applied_date}
                       </td>
                     </tr>
-                  ))
-                }
+                    ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="py-10 text-center text-gray-500 font-medium"
+                    >
+                      No Recent Applications Found
+                    </td>
+                  </tr>
+                )}
+                
               </tbody>
         </table>
       </div>

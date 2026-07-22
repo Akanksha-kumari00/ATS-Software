@@ -4,7 +4,10 @@ const connection = mysql.createPool({
   host: "localhost",
   user: "root",
   password: "Sona@root22",
-  database: "ats_db"
+  database: "ats_db",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
 console.log("MySQL Connected");

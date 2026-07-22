@@ -8,7 +8,6 @@ router.get("/", async (req, res) => {
   try {
 
     const { search = "", specialization = "", uploadDate = "" } = req.query;
-
     let sql = `
       SELECT *
       FROM resume_bank
@@ -16,7 +15,6 @@ router.get("/", async (req, res) => {
     `;
 
     const params = [];
-
     // Search by Candidate Name or Mobile
     if (search) {
       sql += `
@@ -30,8 +28,8 @@ router.get("/", async (req, res) => {
 
     // Filter by Specialization
     if (specialization) {
-      sql += ` AND specialization = ? `;
-      params.push(specialization);
+      sql += ` AND specialization LIKE ? `;
+      params.push(`%${specialization}%`);
     }
 
     // Filter by Upload Date
@@ -95,13 +93,13 @@ router.delete("/:id", async (req, res) => {
     });
 
   } catch (err) {
-  console.log(err);
+    console.log(err);
 
-  res.status(500).json({
-    message: err.message,
-    stack: err.stack
-  });
-}
+    res.status(500).json({
+      message: err.message,
+      stack: err.stack
+    });
+  }
 });
 
 module.exports = router;

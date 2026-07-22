@@ -255,8 +255,10 @@ export default function JobFormModal({
                 {errors.max_experience}
               </p>
             )}
+            
           <select
             name="accommodation"
+            placeholder="accomodation"
             value={form.accommodation}
             onChange={handleChange}
             className={`border rounded-lg p-2 ${
