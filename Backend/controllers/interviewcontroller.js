@@ -1,5 +1,4 @@
 const db = require("../config/db");
-
 // GET ALL SCHEDULED INTERVIEWS
 exports.getInterviews = async (req, res) => {
   try {
@@ -14,7 +13,6 @@ exports.getInterviews = async (req, res) => {
     `);
 
     const totalRecords = countResult.total;
-
     const [rows] = await db.query(`
       SELECT
         id,
@@ -125,6 +123,8 @@ exports.getShortlistedCandidates = async (req, res) => {
     });
   }
 };
+
+
 // SCHEDULE INTERVIEW
 exports.scheduleInterview = async (req, res) => {
   try {
@@ -179,10 +179,10 @@ exports.updateInterviewStatus = async (req, res) => {
       message: "Interview Updated Successfully"
     });
   }
-  catch(error){
+  catch (error) {
     console.log(error);
     res.status(500).json({
-      message:error.message
+      message: error.message
     });
   }
 };
